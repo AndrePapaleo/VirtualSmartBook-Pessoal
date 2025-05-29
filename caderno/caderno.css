@@ -1,0 +1,34 @@
+body {
+    font-family: 'Inter', sans-serif;
+    overflow: hidden; /* Evita rolagem desnecessária no corpo principal */
+}
+/* Estilo para a área de conteúdo editável */
+.content-editable-area {
+    min-height: calc(100vh - 12rem); /* Altura mínima para a área de edição */
+    outline: none; /* Remove a borda de foco padrão */
+    padding: 1rem;
+    line-height: 1.5;
+    overflow-y: auto; /* Adiciona rolagem se o conteúdo exceder a altura */
+    white-space: pre-wrap; /* Preserva espaços em branco e quebras de linha */
+}
+/* Estilos para a barra de rolagem */
+.content-editable-area::-webkit-scrollbar {
+    width: 8px;
+}
+.content-editable-area::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.content-editable-area::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+.content-editable-area::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+/* Estilo para botões de seção/página ativos */
+.active-item {
+    background-color: #e0f2fe; /* light blue-100 */
+    border-left: 4px solid #3b82f6; /* blue-500 */
+    font-weight: 600;
+}
