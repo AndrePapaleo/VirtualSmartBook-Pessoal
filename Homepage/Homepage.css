@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Início - Virtual Smart Book</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    </head>
+<body class="text-gray-800">
+
+    <nav class="navbar-sticky h-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-full">
+            <a href="#" class="text-2xl font-bold text-blue-700 flex items-center">
+                <img src="https://placehold.co/36x36/3B82F6/FFFFFF?text=VSB&font=inter" alt="[Logo VSB]" class="mr-2.5 rounded-md">
+                VSB
+            </a>
+
+            <div class="hidden md:flex flex-grow max-w-xl mx-4 search-bar-container">
+                <input type="search" placeholder="Pesquisar nos seus cadernos..." class="w-full px-4 py-2.5 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none text-sm">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-r-md text-sm flex items-center">
+                    <i class="fas fa-search fa-fw"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button class="md:hidden text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50 transition-colors" title="Pesquisar">
+                    <i class="fas fa-search fa-fw text-lg"></i>
+                </button>
+                <button class="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-blue-50 transition-colors relative" title="Notificações">
+                    <i class="fas fa-bell fa-fw text-lg"></i>
+                    <span class="absolute top-1 right-1.5 block h-2 w-2 rounded-full bg-pink-500 ring-2 ring-white"></span>
+                </button>
+                <div class="relative">
+                    <button id="user-menu-button-home" class="flex items-center space-x-2 text-sm text-gray-700 p-1 rounded-full hover:bg-blue-50">
+                        <img src="https://placehold.co/36x36/C7D2FE/4338CA?text=U" alt="[Avatar do Utilizador]" class="w-9 h-9 rounded-full border-2 border-transparent hover:border-blue-300">
+                    </button>
+                    <div id="user-menu-dropdown-home" class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-1 z-20 hidden ring-1 ring-black ring-opacity-5">
+                        <div class="px-4 py-3">
+                            <p class="text-sm font-semibold text-gray-900 truncate">Nome do Utilizador</p>
+                            <p class="text-xs text-gray-500 truncate">utilizador@email.com</p>
+                        </div>
+                        <hr class="border-gray-200 my-1">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-md mx-1">Meu Perfil</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-md mx-1">Meus Cadernos</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 rounded-md mx-1">Configurações</a>
+                        <hr class="border-gray-200 my-1">
+                        <a href="login.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 rounded-md mx-1">Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        
+        <section class="mb-10 md:mb-16">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Bem-vindo(a) de volta!</h1>
+            <p class="text-gray-600 text-base sm:text-lg">Pronto para organizar as suas ideias e potenciar os seus estudos?</p>
+        </section>
+
+        <section class="mb-10 md:mb-16">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl sm:text-2xl font-semibold section-title">Começar</h2>
+                <a href="#" class="text-sm font-medium view-all-link flex items-center">
+                    Ver Galeria de Modelos <i class="fas fa-arrow-right fa-xs ml-1.5"></i>
+                </a>
+            </div>
+            <div id="start-new-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                <a href="#" id="create-blank-notebook" class="template-card bg-white p-5 rounded-xl shadow-sm border border-transparent hover:border-blue-500 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-blue-500 flex items-center justify-center mb-4">
+                        <i class="fas fa-plus fa-2x text-white"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-700 text-sm sm:text-base">Caderno em Branco</h3>
+                    <p class="text-xs text-gray-500 mt-1">Comece do zero</p>
+                </a>
+                <a href="#" class="template-card bg-white p-5 rounded-xl shadow-sm border border-transparent hover:border-blue-500 flex flex-col items-center text-center">
+                    <div class="template-card-icon-bg w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-flask fa-2x template-card-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-700 text-sm sm:text-base">Caderno Ciências</h3>
+                    <p class="text-xs text-gray-500 mt-1">Fórmulas e Experiências</p>
+                </a>
+                <a href="#" class="template-card bg-white p-5 rounded-xl shadow-sm border border-transparent hover:border-blue-500 flex flex-col items-center text-center">
+                    <div class="template-card-icon-bg w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-calculator fa-2x template-card-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-700 text-sm sm:text-base">Caderno Matemática</h3>
+                    <p class="text-xs text-gray-500 mt-1">Cálculos e Teoremas</p>
+                </a>
+                <a href="#" class="template-card bg-white p-5 rounded-xl shadow-sm border border-transparent hover:border-blue-500 flex flex-col items-center text-center">
+                    <div class="template-card-icon-bg w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-book-open fa-2x template-card-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-700 text-sm sm:text-base">Caderno Português</h3>
+                    <p class="text-xs text-gray-500 mt-1">Gramática e Literatura</p>
+                </a>
+                <a href="#" class="template-card bg-white p-5 rounded-xl shadow-sm border border-transparent hover:border-blue-500 flex flex-col items-center text-center">
+                    <div class="template-card-icon-bg w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-landmark fa-2x template-card-icon"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-700 text-sm sm:text-base">Caderno História</h3>
+                    <p class="text-xs text-gray-500 mt-1">Datas e Eventos</p>
+                </a>
+            </div>
+        </section>
+
+        <section class="mb-10 md:mb-16">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl sm:text-2xl font-semibold section-title">Acesso Rápido</h2>
+                <a href="#" class="text-sm font-medium view-all-link">Ver Todos</a>
+            </div>
+            <div id="recent-items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                <a href="#" class="recent-item-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="h-24 sm:h-32 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
+                        <i class="fas fa-atom fa-3x text-white opacity-50"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-800 text-base truncate mb-1">Pag 3. Caderno Ciências</h3>
+                        <p class="text-xs text-gray-500">Modificado em 10 de Abr. de 2024</p>
+                    </div>
+                </a>
+                <a href="#" class="recent-item-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                     <div class="h-24 sm:h-32 bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+                        <i class="fas fa-square-root-alt fa-3x text-white opacity-50"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-800 text-base truncate mb-1">Pag 1. Caderno Matemática</h3>
+                        <p class="text-xs text-gray-500">Modificado em 19 de Jun. de 2024</p>
+                    </div>
+                </a>
+                <a href="#" class="recent-item-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                     <div class="h-24 sm:h-32 bg-gradient-to-br from-purple-400 to-fuchsia-500 flex items-center justify-center">
+                        <i class="fas fa-feather-alt fa-3x text-white opacity-50"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-800 text-base truncate mb-1">Pag 3. Caderno Português</h3>
+                        <p class="text-xs text-gray-500">Modificado em 01 de Out. de 2024</p>
+                    </div>
+                </a>
+                 <a href="#" class="recent-item-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hidden sm:block">
+                     <div class="h-24 sm:h-32 bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center">
+                        <i class="fas fa-landmark fa-3x text-white opacity-50"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-800 text-base truncate mb-1">Pag 7. Caderno História</h3>
+                        <p class="text-xs text-gray-500">Modificado em 20 de Jun. de 2024</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl sm:text-2xl font-semibold section-title">Meus Cadernos</h2>
+                <a href="#" class="text-sm font-medium view-all-link">Ver Todos os Cadernos</a>
+            </div>
+            <div id="my-notebooks-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                <a href="#" class="notebook-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+                    <div class="notebook-card-cover bg-blue-500">
+                        <i class="fas fa-book fa-3x text-white opacity-75"></i>
+                    </div>
+                    <div class="p-4 flex-grow">
+                        <h3 class="font-semibold text-gray-800 text-base truncate mb-1">Caderno de Biologia Celular</h3>
+                        <p class="text-xs text-gray-500">15 páginas</p>
+                    </div>
+                    <div class="p-3 border-t border-gray-100 text-right">
+                         <span class="text-xs text-gray-400">Última edição: Ontem</span>
+                    </div>
+                </a>
+                <a href="#" class="notebook-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+                    <div class="notebook-card-cover bg-green-500">
+                        <i class="fas fa-leaf fa-3x text-white opacity-75"></i>
+                    </div>
+                    <div class="p-4 flex-grow">
+                        <h3 class="font-semibold text-gray-800 text-base truncate mb-1">Projetos de Botânica</h3>
+                        <p class="text-xs text-gray-500">8 páginas</p>
+                    </div>
+                     <div class="p-3 border-t border-gray-100 text-right">
+                         <span class="text-xs text-gray-400">Última edição: 3 dias atrás</span>
+                    </div>
+                </a>
+                <a href="#" class="notebook-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+                    <div class="notebook-card-cover bg-purple-500">
+                        <i class="fas fa-lightbulb fa-3x text-white opacity-75"></i>
+                    </div>
+                    <div class="p-4 flex-grow">
+                        <h3 class="font-semibold text-gray-800 text-base truncate mb-1">Ideias para TCC</h3>
+                        <p class="text-xs text-gray-500">22 páginas</p>
+                    </div>
+                     <div class="p-3 border-t border-gray-100 text-right">
+                         <span class="text-xs text-gray-400">Última edição: Semana passada</span>
+                    </div>
+                </a>
+                <a href="#" class="notebook-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+                    <div class="notebook-card-cover bg-gray-400">
+                        <i class="fas fa-book-open fa-3x text-white opacity-75"></i>
+                    </div>
+                    <div class="p-4 flex-grow">
+                        <h3 class="font-semibold text-gray-800 text-base truncate mb-1">Meu Novo Caderno</h3>
+                        <p class="text-xs text-gray-500">0 páginas</p>
+                    </div>
+                     <div class="p-3 border-t border-gray-100 text-right">
+                         <span class="text-xs text-gray-400">Criado hoje</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-8 mt-8 md:mt-12 border-t border-gray-200">
+        <p class="text-xs text-gray-500">&copy; 2024 Virtual Smart Book. Todos os direitos reservados.</p>
+    </footer>
+
+    <div id="vsb-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden z-[100] p-4 modal-overlay">
+        <div class="bg-white p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-md modal-content">
+            <h3 id="vsb-modal-title" class="text-xl font-semibold mb-4 text-gray-800">Título do Modal</h3>
+            <p id="vsb-modal-message" class="mb-5 text-sm text-gray-600"></p>
+            <input type="text" id="vsb-modal-input" class="w-full p-2.5 border border-gray-300 rounded-md mb-5 hidden focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="Digite aqui...">
+            <div class="flex justify-end space-x-3">
+                <button id="vsb-modal-cancel-btn" class="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors duration-200 font-medium text-sm">Cancelar</button>
+                <button id="vsb-modal-confirm-btn" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>
