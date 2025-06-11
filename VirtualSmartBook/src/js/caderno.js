@@ -317,7 +317,7 @@ function initializeApp() {
         const defaultPageId = generateUniqueId();
         appData.notebooks[appData.activeNotebook].sections[defaultSectionId].pages[defaultPageId] = {
             name: 'Bem-vindo!',
-            content: '<p>Este é o seu protótipo OneNote.</p><p>Use a barra lateral esquerda para adicionar novas seções e a barra lateral direita para adicionar novas páginas.</p><p>Você pode editar o texto aqui, mudar a fonte e o tamanho usando a barra de ferramentas acima.</p>'
+            content: '<p></p>'
         };
         appData.activePage = defaultPageId;
     }

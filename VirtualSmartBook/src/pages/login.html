@@ -9,12 +9,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/login.css">
     </head>
 <body class="background-gradient min-h-screen flex items-center justify-center p-4">
-
+<form id="loginForm">
     <div class="login-card w-full max-w-md p-8 space-y-6 rounded-xl shadow-2xl">
         <div class="text-center">
-            <a href="#" class="inline-block mb-6 text-3xl font-bold text-blue-700">
+            <a href="../../index.html" class="inline-block mb-6 text-3xl font-bold text-blue-700">
                 VSB <span class="font-normal text-gray-700">| Virtual Smart Book</span>
             </a>
             <h2 class="text-2xl font-semibold text-gray-800">Acesse sua Conta</h2>
@@ -48,16 +49,18 @@
             </div>
 
             <div>
+                <a>
                 <button type="submit"
                         class="btn-primary w-full text-white py-3 px-4 rounded-lg font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150">
                     Entrar
                 </button>
             </div>
         </form>
+        </form>
 
         <p class="text-sm text-center text-gray-600">
             Não tem uma conta?
-            <a href="#" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">
+            <a href="cadastro.html" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">
                 Cadastre-se aqui
             </a>
         </p>
@@ -86,6 +89,6 @@
             &copy; 2025 Virtual Smart Book. Todos os direitos reservados.
         </p>
     </div>
-
+    <script src="../js/login.js"></script>
 </body>
 </html>
