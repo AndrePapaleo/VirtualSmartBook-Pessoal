@@ -1,6 +1,4 @@
-# Repositório oficial do projeto Virtual Smart Book.
-
-# 🖥️ Projetos Full Stack</h1>
+# 🖥️ Projeto Virtual Smart Book.</h1>
 
 Bem-vindo ao repositório oficial do projeto Virtual Smart Book (VSB).
 
