@@ -1,0 +1,36 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Gradiente de fundo ajustado para tons de azul */
+.background-gradient {
+    background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%); /* light blue to medium blue */
+}
+
+.login-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* Para Safari */
+    background-color: rgba(255, 255, 255, 0.92); /* Leve transparência para o efeito de vidro */
+}
+
+ /* Estilo customizado para checkbox - Cor azul principal */
+.custom-checkbox:checked {
+    background-color: #2563EB; /* Tailwind blue-600 */
+    border-color: #2563EB; /* Tailwind blue-600 */
+}
+
+/* Foco do input - Cor azul principal */
+.form-input:focus {
+    border-color: #2563EB; /* Tailwind blue-600 */
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); /* Sombra de foco para blue-600 */
+}
+
+/* Botão primário (Entrar) - Cor azul principal */
+.btn-primary {
+    background-color: #2563EB; /* Tailwind blue-600 */
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #1D4ED8; /* Tailwind blue-700 */
+}

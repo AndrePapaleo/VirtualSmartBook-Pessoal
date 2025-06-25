@@ -1,0 +1,144 @@
+/* src/css/home.css */
+
+/* Definição da fonte Inter para todo o corpo */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc; /* Um cinza muito claro para o fundo geral */
+}
+
+/* Barra de Navegação Fixa no topo */
+.navbar-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03); /* Sombra mais sutil para a barra de navegação */
+}
+
+/* Títulos de Seção */
+.section-title {
+    color: #1e3a8a; /* Azul escuro para títulos */
+    position: relative;
+    padding-bottom: 8px; /* Espaço para o underline */
+}
+
+/* Underline para títulos de seção */
+.section-title::after {
+    content: '';
+    display: block;
+    width: 50px; /* Largura do underline ligeiramente menor */
+    height: 3px; /* Espessura do underline ligeiramente menor */
+    background-color: #2563EB; /* Azul VSB */
+    margin-top: 6px;
+    margin-left: 0; /* Alinhado à esquerda para títulos de seção */
+    margin-right: auto;
+}
+
+/* Estilo Base para Cartões (Caderno, Item Recente) */
+.notebook-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 0.5rem; /* rounded-lg, um pouco menos arredondado */
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb; /* border border-gray-200 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04); /* shadow-sm mais leve */
+    padding-bottom: 1rem; /* Adicionado para dar espaço ao dropdown */
+    position: relative; /* Garante que o z-index e posicionamento absoluto do dropdown funcionem */
+    z-index: 1; /* Garante que cada cartão tenha seu próprio contexto de empilhamento */
+    overflow: visible !important; /* NOVO: Garante que o cartão em si não corte */
+}
+
+/* Efeito de Hover para Cartões */
+.notebook-card:hover {
+    transform: translateY(-3px); /* Desloca ligeiramente para cima, menos que antes */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada, mas ainda leve */
+    z-index: 10; /* Eleva o cartão no hover para que o dropdown apareça acima dos vizinhos */
+}
+
+/* Capa do Cartão do Caderno (para "Meus Cadernos" e "Documentos Recentes") */
+.notebook-card-cover {
+    height: 80px; /* Altura ligeiramente menor */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Borda mais suave */
+    color: rgba(255, 255, 255, 0.85); /* Cor do ícone */
+}
+
+/* Corpo do Cartão do Caderno */
+.notebook-card .p-4 {
+    flex-grow: 1; /* Permite que o corpo ocupe o espaço restante */
+    padding: 0.75rem; /* Menos padding */
+    overflow: visible !important; /* NOVO: Garante que o conteúdo do card não corte */
+}
+
+/* Rodapé do Cartão do Caderno */
+.notebook-card .p-3 {
+    border-top: 1px solid #f3f4f6; /* border-t border-gray-100 */
+    text-align: right;
+    padding: 0.5rem; /* Menos padding */
+}
+
+/* Estilo para a mensagem de "Nenhum caderno/documento" */
+#no-notebooks-message, #no-recent-documents-message {
+    font-style: italic;
+    color: #6b7280; /* text-gray-500 */
+    font-size: 0.875rem; /* text-sm */
+}
+
+/* Estilos para o Modal */
+.modal-overlay {
+    transition: opacity 0.3s ease-out; /* Transição para opacidade */
+}
+
+.modal-content {
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* Transição para escala e opacidade */
+    padding: 1.5rem; /* Padding ligeiramente menor */
+    border-radius: 0.75rem; /* rounded-xl, um pouco menos arredondado */
+}
+
+/*
+  CORREÇÃO CHAVE PARA O DROPDOWN:
+  Força overflow: visible nos contêineres de grid e nas seções que os contêm.
+  Isso é necessário se um pai estiver cortando o conteúdo absoluto.
+*/
+#my-notebooks-grid,
+#recent-documents-grid,
+section { /* Aplica também às tags section para ser mais abrangente */
+    overflow: visible !important;
+}
+
+/* NOVO: Garante que o div absoluto que contém o botão de opções e o dropdown não corte. */
+/* Este é o div com class="absolute top-2 right-2" dentro do .p-4 do notebook-card */
+.notebook-card .p-4 > .absolute {
+    overflow: visible !important;
+}
+
+/* Estilos para o Dropdown de Opções do Caderno */
+.notebook-options-dropdown {
+    z-index: 99999 !important; /* Aumenta AINDA MAIS o z-index para ter prioridade máxima */
+    position: absolute; 
+    right: 0; 
+    top: calc(100% + 5px); /* Posiciona abaixo do botão, com um pequeno espaçamento */
+    /* will-change: transform; /* Pode ajudar na performance, mas não é a causa do problema */
+}
+
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9; /* cor da trilha da barra de rolagem (light gray) */
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* cor do "polegar" da barra de rolagem (medium gray) */
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* cor do "polegar" ao passar o mouse (darker gray) */
+}
