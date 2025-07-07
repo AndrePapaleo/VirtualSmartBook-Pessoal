@@ -28,6 +28,15 @@ const vsbModalCancelBtn = document.getElementById('vsb-modal-cancel-btn');
 const vsbModalConfirmBtn = document.getElementById('vsb-modal-confirm-btn');
 let modalConfirmCallback = null; // Callback para o botão de confirmação do modal
 
+// --- NOVOS Elementos de Pesquisa ---
+const searchForm = document.getElementById('search-form');
+const searchInput = document.getElementById('search-input');
+const searchResultsSection = document.getElementById('search-results-section');
+const searchResultsContainer = document.getElementById('search-results-container');
+const noSearchResultsMessage = document.getElementById('no-search-results-message');
+const recentDocumentsSection = document.getElementById('recent-documents-section');
+const myNotebooksSection = document.getElementById('my-notebooks-section');
+
 // --- Citações Motivacionais ---
 const motivationalQuotes = [
     { quote: "A educação é a arma mais poderosa que você pode usar para mudar o mundo.", author: "Nelson Mandela" },
@@ -41,112 +50,78 @@ const motivationalQuotes = [
 ];
 
 // --- PONTO DE ENTRADA: Verifica o estado de autenticação do usuário ---
-console.log("home.js: Iniciando onAuthStateChanged listener.");
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUserId = user.uid;
-        console.log("home.js: Usuário autenticado. UID:", currentUserId);
-
         const displayName = user.displayName || user.email.split('@')[0]; 
-        console.log("home.js: Display Name:", displayName);
         
         document.getElementById('welcome-user-name').textContent = displayName; 
         if (userDisplayName) {
              userDisplayName.textContent = displayName;
-             console.log("home.js: Nome de usuário no DOM atualizado.");
-        } else {
-             console.log("home.js: Elemento userDisplayName não encontrado no DOM.");
         }
 
         loadUserData(); 
         displayRandomQuote(); 
     } else {
-        console.log("home.js: Usuário não autenticado. Redirecionando para login.html");
         window.location.href = 'login.html';
     }
 });
 
 // --- FUNÇÕES DE DADOS (FIRESTORE) ---
 async function loadUserData() {
-    if (!currentUserId) {
-        console.error("loadUserData: currentUserId não definido.");
-        return;
-    }
+    if (!currentUserId) return;
     const userDocRef = doc(db, "notebooks", currentUserId);
-    console.log("loadUserData: Tentando buscar documento do usuário no Firestore.");
     try {
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
             userData = docSnap.data();
-            console.log("loadUserData: Dados do usuário carregados:", userData);
         } else {
             userData = { notebooks: {} };
-            console.log("loadUserData: Documento do usuário não encontrado, inicializando com notebooks vazios.");
         }
         renderNotebooks(); 
         renderRecentDocuments(); 
     } catch (error) {
-        console.error("loadUserData: Erro ao carregar dados do usuário:", error);
+        console.error("Erro ao carregar dados do usuário:", error);
     }
 }
 
 async function saveUserData() {
-    if (!currentUserId) {
-        console.error("saveUserData: currentUserId não definido. Não foi possível salvar dados.");
-        return;
-    }
+    if (!currentUserId) return;
     try {
         const userDocRef = doc(db, "notebooks", currentUserId);
-        console.log("saveUserData: Tentando salvar dados no Firestore.", userData);
         await setDoc(userDocRef, userData);
-        console.log("saveUserData: Alterações salvas no Firestore com sucesso.");
+        console.log("Alterações salvas no Firestore com sucesso.");
     } catch (error) {
-        console.error("saveUserData: Erro ao salvar dados:", error);
+        console.error("Erro ao salvar dados:", error);
     }
 }
 
 // --- FUNÇÕES DE UI ---
 function renderNotebooks() {
-    console.log("renderNotebooks: Iniciando renderização de Meus Cadernos.");
     myNotebooksGrid.innerHTML = ''; 
     
     const allNotebooks = Object.keys(userData.notebooks || {}).map(id => ({ id, ...userData.notebooks[id] }));
-
-    const sortedNotebooks = allNotebooks.sort((a, b) => {
-        const timestampA = parseInt(a.id.replace('notebook-', ''));
-        const timestampB = parseInt(b.id.replace('notebook-', ''));
-        return timestampA - timestampB; 
-    });
-    console.log("renderNotebooks: Cadernos ordenados por criação:", sortedNotebooks);
-
+    const sortedNotebooks = allNotebooks.sort((a, b) => parseInt(a.id.replace('notebook-', '')) - parseInt(b.id.replace('notebook-', '')));
 
     if (sortedNotebooks.length === 0) {
-        if (noNotebooksMessage) {
-            noNotebooksMessage.classList.remove('hidden');
-            console.log("renderNotebooks: Exibindo mensagem de nenhum caderno.");
-        }
+        if (noNotebooksMessage) noNotebooksMessage.classList.remove('hidden');
         return;
     } else {
-        if (noNotebooksMessage) {
-            noNotebooksMessage.classList.add('hidden');
-            console.log("renderNotebooks: Escondendo mensagem de nenhum caderno.");
-        }
+        if (noNotebooksMessage) noNotebooksMessage.classList.add('hidden');
     }
 
     sortedNotebooks.forEach(notebook => {
-        const card = document.createElement('div'); // Mudado para div para comportar o menu
+        const card = document.createElement('div');
         card.className = "notebook-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-200";
-
         const randomColor = notebookCoverColors[Math.floor(Math.random() * notebookCoverColors.length)];
         
-        // Estrutura do card com link na capa e menu de opções
         card.innerHTML = `
             <a href="caderno.html?notebookId=${notebook.id}" class="block">
                 <div class="notebook-card-cover ${randomColor} flex items-center justify-center">
                     <i class="fas fa-book fa-3x text-white opacity-75"></i>
                 </div>
             </a>
-            <div class="p-4 flex-grow relative"> <!-- Adicionado relative para o menu -->
+            <div class="p-4 flex-grow relative">
                 <a href="caderno.html?notebookId=${notebook.id}" class="block">
                     <h3 class="font-semibold text-gray-800 text-base truncate mb-1">${notebook.name}</h3>
                 </a>
@@ -162,43 +137,26 @@ function renderNotebooks() {
             </div>
         `;
         myNotebooksGrid.appendChild(card);
-        console.log("renderNotebooks: Card para", notebook.name, "adicionado.");
     });
 }
 
 function renderRecentDocuments() {
-    console.log("renderRecentDocuments: Iniciando renderização.");
     recentDocumentsGrid.innerHTML = ''; 
-    
     const allNotebooks = Object.keys(userData.notebooks || {}).map(id => ({ id, ...userData.notebooks[id] }));
-
-    const notebooksToDisplay = allNotebooks
-        .filter(notebook => notebook.lastModified)
-        .sort((a, b) => b.lastModified - a.lastModified); 
-    console.log("renderRecentDocuments: Cadernos ordenados para exibição:", notebooksToDisplay);
+    const notebooksToDisplay = allNotebooks.filter(notebook => notebook.lastModified).sort((a, b) => b.lastModified - a.lastModified); 
 
     if (notebooksToDisplay.length === 0) {
-        if (noRecentDocumentsMessage) {
-            noRecentDocumentsMessage.classList.remove('hidden');
-            console.log("renderRecentDocuments: Exibindo mensagem de nenhum documento recente.");
-        }
+        if (noRecentDocumentsMessage) noRecentDocumentsMessage.classList.remove('hidden');
         return;
     } else {
-        if (noRecentDocumentsMessage) {
-            noRecentDocumentsMessage.classList.add('hidden');
-            console.log("renderRecentDocuments: Escondendo mensagem de nenhum documento recente.");
-        }
+        if (noRecentDocumentsMessage) noRecentDocumentsMessage.classList.add('hidden');
     }
 
     notebooksToDisplay.forEach(notebook => {
-        const card = document.createElement('div'); // Mudado para div
+        const card = document.createElement('div');
         card.className = "notebook-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-200";
-
         const randomColor = notebookCoverColors[Math.floor(Math.random() * notebookCoverColors.length)];
-        const numPages = Object.keys(notebook.sections || {}).reduce((acc, sectionId) => {
-            return acc + Object.keys(notebook.sections[sectionId].pages || {}).length;
-        }, 0);
-        
+        const numPages = Object.keys(notebook.sections || {}).reduce((acc, sectionId) => acc + Object.keys(notebook.sections[sectionId].pages || {}).length, 0);
         const lastModifiedDate = new Date(notebook.lastModified).toLocaleDateString('pt-BR');
 
         card.innerHTML = `
@@ -207,7 +165,7 @@ function renderRecentDocuments() {
                     <i class="fas fa-file-alt fa-3x text-white opacity-75"></i>
                 </div>
             </a>
-            <div class="p-4 flex-grow relative"> <!-- Adicionado relative para o menu -->
+            <div class="p-4 flex-grow relative">
                 <a href="caderno.html?notebookId=${notebook.id}" class="block">
                     <h3 class="font-semibold text-gray-800 text-base truncate mb-1">${notebook.name}</h3>
                 </a>
@@ -221,13 +179,12 @@ function renderRecentDocuments() {
                         <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 delete-notebook-option" data-notebook-id="${notebook.id}">Excluir</a>
                     </div>
                 </div>
-                <div class="p-3 border-t border-gray-100 text-right -mx-4 -mb-4 mt-2"> <!-- Ajustado padding e margin -->
+                <div class="p-3 border-t border-gray-100 text-right -mx-4 -mb-4 mt-2">
                     <span class="text-xs text-gray-400">Última mod.: ${lastModifiedDate}</span>
                 </div>
             </div>
         `;
         recentDocumentsGrid.appendChild(card);
-        console.log("renderRecentDocuments: Card para", notebook.name, "adicionado.");
     });
 }
 
@@ -236,27 +193,17 @@ function displayRandomQuote() {
         const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
         const { quote, author } = motivationalQuotes[randomIndex];
         quoteOfTheDayEl.innerHTML = `"${quote}" - <span class="font-semibold">${author}</span>`;
-        console.log("displayRandomQuote: Citação atualizada.");
-    } else {
-        console.log("displayRandomQuote: Elemento quoteOfTheDayEl não encontrado.");
     }
 }
 
 // --- LÓGICA DO MODAL ---
 function showModal(title, message, showInput, confirmCallback, inputValue = '') {
-    if (!vsbModal) {
-        console.error("showModal: Elemento vsbModal não encontrado.");
-        return;
-    }
-    console.log("showModal: Abrindo modal com título:", title);
-
+    if (!vsbModal) return;
     vsbModalTitle.textContent = title;
     vsbModalMessage.textContent = message;
     vsbModalInput.value = inputValue; 
     vsbModalInput.classList.toggle('hidden', !showInput); 
-    
     modalConfirmCallback = confirmCallback;
-
     vsbModal.classList.remove('hidden');
     void vsbModal.offsetWidth; 
     vsbModal.classList.remove('opacity-0', 'scale-95');
@@ -266,27 +213,20 @@ function showModal(title, message, showInput, confirmCallback, inputValue = '') 
 
 function hideModal() {
     if (!vsbModal) return; 
-    console.log("hideModal: Fechando modal.");
-
     vsbModal.classList.add('opacity-0', 'scale-95');
     setTimeout(() => {
         vsbModal.classList.add('hidden');
     }, 300); 
-    
     modalConfirmCallback = null; 
     vsbModalInput.value = ''; 
 }
 
 // --- Funções para gerenciar cadernos na HOME ---
 async function renameNotebook(notebookId, newName) {
-    if (!currentUserId || !userData.notebooks[notebookId]) {
-        console.error("renameNotebook: Dados inválidos para renomear.");
-        showModal('Erro', 'Não foi possível renomear o caderno. Tente novamente.', false, () => {});
-        return;
-    }
+    if (!currentUserId || !userData.notebooks[notebookId]) return;
     const oldName = userData.notebooks[notebookId].name;
     userData.notebooks[notebookId].name = newName.trim();
-    userData.notebooks[notebookId].lastModified = Date.now(); // Atualiza a data de modificação
+    userData.notebooks[notebookId].lastModified = Date.now();
     await saveUserData();
     showModal('Sucesso!', `Caderno "${oldName}" renomeado para "${newName.trim()}" com sucesso!`, false, () => {});
     renderNotebooks();
@@ -294,11 +234,7 @@ async function renameNotebook(notebookId, newName) {
 }
 
 async function deleteNotebook(notebookId) {
-    if (!currentUserId || !userData.notebooks[notebookId]) {
-        console.error("deleteNotebook: Dados inválidos para excluir.");
-        showModal('Erro', 'Não foi possível excluir o caderno. Tente novamente.', false, () => {});
-        return;
-    }
+    if (!currentUserId || !userData.notebooks[notebookId]) return;
     const notebookName = userData.notebooks[notebookId].name;
     delete userData.notebooks[notebookId];
     await saveUserData();
@@ -307,51 +243,132 @@ async function deleteNotebook(notebookId) {
     renderRecentDocuments();
 }
 
+// ==================================================================
+// INÍCIO: Lógica de Pesquisa
+// ==================================================================
+
+function performSearch(query) {
+    const lowerCaseQuery = query.toLowerCase();
+    const results = [];
+
+    if (!userData.notebooks) return [];
+
+    // Percorre todos os cadernos
+    for (const notebookId in userData.notebooks) {
+        const notebook = userData.notebooks[notebookId];
+
+        // Percorre todas as seções do caderno
+        for (const sectionId in notebook.sections) {
+            const section = notebook.sections[sectionId];
+
+            // Percorre todas as páginas da seção
+            for (const pageId in section.pages) {
+                const page = section.pages[pageId];
+                const pageContentText = getTextFromHtml(page.content || '');
+                
+                // Verifica se o nome da página ou o conteúdo correspondem à pesquisa
+                if (page.name.toLowerCase().includes(lowerCaseQuery) || pageContentText.toLowerCase().includes(lowerCaseQuery)) {
+                    results.push({
+                        notebookId,
+                        notebookName: notebook.name,
+                        sectionName: section.name,
+                        pageId,
+                        pageName: page.name,
+                        snippet: createSnippet(pageContentText, lowerCaseQuery)
+                    });
+                }
+            }
+        }
+    }
+    return results;
+}
+
+function renderSearchResults(results, query) {
+    searchResultsContainer.innerHTML = '';
+
+    if (results.length === 0) {
+        noSearchResultsMessage.classList.remove('hidden');
+        return;
+    }
+
+    noSearchResultsMessage.classList.add('hidden');
+    const queryRegex = new RegExp(`(${query})`, 'gi');
+
+    results.forEach(result => {
+        const resultEl = document.createElement('a');
+        resultEl.href = `caderno.html?notebookId=${result.notebookId}&pageId=${result.pageId}`;
+        resultEl.className = 'search-result-item';
+
+        // Destaca o termo pesquisado no título e no snippet
+        const highlightedTitle = result.pageName.replace(queryRegex, '<mark>$1</mark>');
+        const highlightedSnippet = result.snippet.replace(queryRegex, '<mark>$1</mark>');
+
+        resultEl.innerHTML = `
+            <h3 class="result-title text-lg">${highlightedTitle}</h3>
+            <p class="result-path">${result.notebookName} / ${result.sectionName}</p>
+            <p class="result-snippet">${highlightedSnippet}</p>
+        `;
+        searchResultsContainer.appendChild(resultEl);
+    });
+}
+
+// Função auxiliar para extrair texto puro do HTML do conteúdo da página
+function getTextFromHtml(html) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    return tempDiv.textContent || tempDiv.innerText || '';
+}
+
+// Função auxiliar para criar um pequeno trecho do texto encontrado
+function createSnippet(text, query) {
+    const index = text.toLowerCase().indexOf(query.toLowerCase());
+    if (index === -1) return text.substring(0, 150) + '...';
+
+    const start = Math.max(0, index - 40);
+    const end = Math.min(text.length, index + query.length + 40);
+    let snippet = text.substring(start, end);
+
+    if (start > 0) snippet = '...' + snippet;
+    if (end < text.length) snippet = snippet + '...';
+    
+    return snippet;
+}
+
+// ==================================================================
+// FIM: Lógica de Pesquisa
+// ==================================================================
+
 
 // --- EVENT LISTENERS ---
 
-// Listener para o botão "Criar Novo Caderno"
 if (createNotebookButton) { 
     createNotebookButton.addEventListener('click', () => {
-        console.log("createNotebookButton: Clicado no botão 'Criar Novo Caderno'.");
         showModal('Criar Novo Caderno', 'Qual será o nome do seu caderno?', true, async (notebookName) => {
             if (notebookName && notebookName.trim() !== "") {
-                console.log("Modal Confirmado: Nome do caderno:", notebookName);
                 const newNotebookId = `notebook-${Date.now()}`; 
                 userData.notebooks[newNotebookId] = { name: notebookName.trim(), sections: {}, lastModified: Date.now() }; 
-                console.log("Dados do usuário antes de salvar:", userData);
                 await saveUserData(); 
                 renderNotebooks(); 
                 renderRecentDocuments(); 
             } else {
-                console.log("Modal Cancelado ou Nome do caderno vazio.");
                 showModal('Atenção', 'O nome do caderno não pode estar em branco.', false, () => {});
             }
         });
     });
-} else {
-    console.error("createNotebookButton: Elemento 'create-notebook-button' não encontrado no DOM.");
 }
 
-// Listener de delegação de eventos para os cartões de caderno (opções de Renomear/Excluir)
 document.addEventListener('click', (event) => {
-    // Clicou no botão de opções (...)
     if (event.target.closest('.notebook-options-button')) {
         const button = event.target.closest('.notebook-options-button');
-        const dropdown = button.nextElementSibling; // O dropdown é o próximo irmão do botão
-
-        // Fecha todos os outros dropdowns abertos
+        const dropdown = button.nextElementSibling;
         document.querySelectorAll('.notebook-options-dropdown').forEach(d => {
-            if (d !== dropdown) {
-                d.classList.add('hidden');
-            }
+            if (d !== dropdown) d.classList.add('hidden');
         });
-        dropdown.classList.toggle('hidden'); // Alterna a visibilidade do dropdown clicado
-        event.stopPropagation(); // Impede que o clique se propague e feche o dropdown imediatamente
+        dropdown.classList.toggle('hidden');
+        event.stopPropagation();
     } 
-    // Clicou em "Renomear"
     else if (event.target.closest('.rename-notebook-option')) {
-        event.preventDefault(); // Previne o comportamento padrão do link
+        event.preventDefault();
         const notebookId = event.target.dataset.notebookId;
         const currentName = userData.notebooks[notebookId].name;
         showModal('Renomear Caderno', 'Digite o novo nome para o caderno:', true, (newName) => {
@@ -360,96 +377,90 @@ document.addEventListener('click', (event) => {
             } else if (newName.trim() === "") {
                 showModal('Atenção', 'O nome do caderno não pode ser vazio.', false, () => {});
             }
-        }, currentName); // Pré-preenche o input com o nome atual
-        event.target.closest('.notebook-options-dropdown').classList.add('hidden'); // Fecha o dropdown
+        }, currentName);
+        event.target.closest('.notebook-options-dropdown').classList.add('hidden');
     } 
-    // Clicou em "Excluir"
     else if (event.target.closest('.delete-notebook-option')) {
-        event.preventDefault(); // Previne o comportamento padrão do link
+        event.preventDefault();
         const notebookId = event.target.dataset.notebookId;
         const notebookName = userData.notebooks[notebookId].name;
         showModal('Excluir Caderno', `Tem certeza que deseja excluir o caderno "${notebookName}" e todo o seu conteúdo?`, false, (confirm) => {
-            if (confirm) {
-                deleteNotebook(notebookId);
-            }
+            if (confirm) deleteNotebook(notebookId);
         });
-        event.target.closest('.notebook-options-dropdown').classList.add('hidden'); // Fecha o dropdown
+        event.target.closest('.notebook-options-dropdown').classList.add('hidden');
     } 
-    // Clicou em qualquer lugar fora dos dropdowns de opções do caderno
     else if (!event.target.closest('.notebook-card')) {
-        document.querySelectorAll('.notebook-options-dropdown').forEach(d => {
-            d.classList.add('hidden');
-        });
+        document.querySelectorAll('.notebook-options-dropdown').forEach(d => d.classList.add('hidden'));
     }
 });
 
-
-// Listener para o botão de Logout (no dropdown de usuário)
 if (logoutButton) {
     logoutButton.addEventListener('click', async (e) => {
         e.preventDefault();
-        console.log("logoutButton: Clicado no botão 'Sair'.");
         try {
             await signOut(auth); 
-            console.log("Logout bem-sucedido. Redirecionando para login.html");
             window.location.href = 'login.html'; 
         } catch (error) {
-            console.error("logoutButton: Erro ao fazer logout:", error);
+            console.error("Erro ao fazer logout:", error);
         }
     });
-} else {
-    console.log("logoutButton: Elemento 'logout-button' não encontrado no DOM.");
 }
 
-// Listener para o botão de confirmação do modal (VSB Modal)
 if (vsbModalConfirmBtn) {
     vsbModalConfirmBtn.addEventListener('click', () => {
-        console.log("vsbModalConfirmBtn: Clicado no botão 'Confirmar' do modal.");
         if (modalConfirmCallback) {
             const inputValue = vsbModalInput.classList.contains('hidden') ? true : vsbModalInput.value;
             modalConfirmCallback(inputValue);
         }
         hideModal(); 
     });
-} else {
-    console.log("vsbModalConfirmBtn: Elemento 'vsb-modal-confirm-btn' não encontrado no DOM.");
 }
 
-// Listener para o botão de cancelamento do modal (VSB Modal)
 if (vsbModalCancelBtn) {
-    vsbModalCancelBtn.addEventListener('click', () => {
-        console.log("vsbModalCancelBtn: Clicado no botão 'Cancelar' do modal.");
-        hideModal(); 
-    });
-} else {
-    console.log("vsbModalCancelBtn: Elemento 'vsb-modal-cancel-btn' não encontrado no DOM.");
+    vsbModalCancelBtn.addEventListener('click', () => hideModal());
 }
 
-// Listener para o botão do menu do usuário (para abrir/fechar o dropdown)
 if (userMenuButton) {
     userMenuButton.addEventListener('click', (event) => {
         event.stopPropagation(); 
-        if (userMenuDropdown) {
-            userMenuDropdown.classList.toggle('hidden'); 
-            console.log("userMenuButton: Dropdown de usuário alternado.");
-        }
+        if (userMenuDropdown) userMenuDropdown.classList.toggle('hidden'); 
     });
-} else {
-    console.log("userMenuButton: Elemento 'user-menu-button' não encontrado no DOM.");
 }
 
-// Listener global para fechar o dropdown se clicar fora dele
 document.addEventListener('click', (event) => {
     if (userMenuButton && userMenuDropdown && !userMenuButton.contains(event.target) && !userMenuDropdown.contains(event.target)) {
         userMenuDropdown.classList.add('hidden'); 
-        console.log("Document click: Dropdown de usuário fechado (clique fora).");
     }
 });
 
-// Define o ano atual no rodapé
-const currentYearEl = document.getElementById('currentYear');
-if (currentYearEl) {
-    currentYearEl.textContent = new Date().getFullYear();
-} else {
-    console.log("Elemento 'currentYear' não encontrado para atualizar o rodapé.");
+// --- NOVO Event Listener para a Pesquisa ---
+if (searchForm) {
+    searchForm.addEventListener('submit', (e) => {
+        e.preventDefault(); // Impede o recarregamento da página
+        const query = searchInput.value.trim();
+        if (query) {
+            const results = performSearch(query);
+            renderSearchResults(results, query);
+            // Mostra a seção de resultados e esconde as outras
+            searchResultsSection.classList.remove('hidden');
+            recentDocumentsSection.classList.add('hidden');
+            myNotebooksSection.classList.add('hidden');
+        }
+    });
 }
+
+if (searchInput) {
+    // Listener para limpar a pesquisa e restaurar a visualização normal
+    searchInput.addEventListener('input', () => {
+        if (searchInput.value.trim() === '') {
+            searchResultsSection.classList.add('hidden');
+            searchResultsContainer.innerHTML = '';
+            recentDocumentsSection.classList.remove('hidden');
+            myNotebooksSection.classList.remove('hidden');
+        }
+    });
+}
+
+
+const currentYearEl = document.getElementById('currentYear');
+if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();

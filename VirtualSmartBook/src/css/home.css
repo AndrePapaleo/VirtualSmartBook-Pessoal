@@ -142,3 +142,48 @@ section { /* Aplica também às tags section para ser mais abrangente */
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8; /* cor do "polegar" ao passar o mouse (darker gray) */
 }
+
+/* ================================================================== */
+/* INÍCIO: Novos Estilos para a Pesquisa */
+/* ================================================================== */
+.search-result-item {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb; /* border-gray-200 */
+    border-radius: 0.5rem; /* rounded-lg */
+    padding: 1rem; /* p-4 */
+    transition: all 0.2s ease-in-out;
+    display: block; /* Para o <a> preencher o espaço */
+}
+
+.search-result-item:hover {
+    border-color: #3b82f6; /* blue-500 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+    transform: translateY(-2px);
+}
+
+.search-result-item .result-title {
+    color: #1e3a8a; /* text-blue-900 */
+    font-weight: 600; /* font-semibold */
+}
+
+.search-result-item .result-path {
+    font-size: 0.75rem; /* text-xs */
+    color: #6b7280; /* text-gray-500 */
+}
+
+.search-result-item .result-snippet {
+    font-size: 0.875rem; /* text-sm */
+    color: #4b5563; /* text-gray-600 */
+    margin-top: 0.5rem; /* mt-2 */
+}
+
+.search-result-item .result-snippet mark {
+    background-color: #fef3c7; /* yellow-200 */
+    color: #92400e; /* yellow-900 */
+    font-weight: 600;
+    padding: 2px;
+    border-radius: 3px;
+}
+/* ================================================================== */
+/* FIM: Novos Estilos para a Pesquisa */
+/* ================================================================== */

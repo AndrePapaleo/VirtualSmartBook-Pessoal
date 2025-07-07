@@ -8,7 +8,7 @@ let currentUserId = null;
 let activeNotebookId = null;
 let activeSectionId = null;
 let activePageId = null;
-let saveTimeout = null; // Para otimizar o salvamento do conteúdo
+let saveTimeout = null; 
 
 // --- Elementos do DOM ---
 const activeNotebookNameEl = document.getElementById('active-notebook-name');
@@ -18,6 +18,7 @@ const addSectionBtn = document.getElementById('add-section-btn');
 const addPageBtn = document.getElementById('add-page-btn');
 const pageContent = document.getElementById('page-content');
 const currentPageTitle = document.getElementById('current-page-title');
+const pageRenderArea = document.getElementById('page-render-area'); // Wrapper para exportação
 
 // --- Elementos do Modal ---
 const confirmationModal = document.getElementById('confirmation-modal');
@@ -28,7 +29,7 @@ const modalCancelBtn = document.getElementById('modal-cancel-btn');
 const modalConfirmBtn = document.getElementById('modal-confirm-btn');
 let modalConfirmCallback = null;
 
-// --- Novos Elementos da Toolbar (já existentes, apenas re-referenciados para clareza) ---
+// --- Elementos da Toolbar ---
 const saveStatusEl = document.getElementById('save-status');
 const boldBtn = document.getElementById('bold-btn');
 const italicBtn = document.getElementById('italic-btn');
@@ -42,18 +43,24 @@ const alignJustifyBtn = document.getElementById('align-justify-btn');
 const ulBtn = document.getElementById('ul-btn');
 const olBtn = document.getElementById('ol-btn');
 const removeFormatBtn = document.getElementById('remove-format-btn');
+const fontFamilySelect = document.getElementById('font-family-select');
+const fontSizeSelect = document.getElementById('font-size-select');
 
-// --- Novos Botões de Gerenciamento (Caderno, Seção, Página) ---
-const renameNotebookBtn = document.getElementById('rename-notebook-btn'); // NOVO
-const deleteNotebookBtn = document.getElementById('delete-notebook-btn'); // NOVO
+// --- Botões de Gestão ---
+const renameNotebookBtn = document.getElementById('rename-notebook-btn');
+const deleteNotebookBtn = document.getElementById('delete-notebook-btn');
 const renameSectionBtn = document.getElementById('rename-section-btn');
 const deleteSectionBtn = document.getElementById('delete-section-btn');
 const renamePageBtn = document.getElementById('rename-page-btn');
 const deletePageBtn = document.getElementById('delete-page-btn');
 
+// --- NOVOS Botões de Exportação ---
+const exportMdBtn = document.getElementById('export-md-btn');
+const exportPdfBtn = document.getElementById('export-pdf-btn');
+
 
 // =================================================================================
-// PONTO DE ENTRADA PRINCIPAL
+// PONTO DE ENTRADA E LÓGICA DE DADOS
 // =================================================================================
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -61,7 +68,7 @@ onAuthStateChanged(auth, (user) => {
         const urlParams = new URLSearchParams(window.location.search);
         activeNotebookId = urlParams.get('notebookId');
         if (!activeNotebookId) {
-            document.body.innerHTML = '<h1>Erro: ID do caderno não fornecido. Volte para a página inicial e tente novamente.</h1>';
+            document.body.innerHTML = '<h1>Erro: ID do caderno não fornecido. Volte para a página inicial.</h1>';
             return;
         }
         loadInitialData();
@@ -70,43 +77,38 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// =================================================================================
-// FUNÇÕES DE DADOS (COMUNICAÇÃO COM O FIRESTORE)
-// =================================================================================
 async function loadInitialData() {
     const userDocRef = doc(db, "notebooks", currentUserId);
     const docSnap = await getDoc(userDocRef);
     if (docSnap.exists()) {
         userData = docSnap.data();
-        // Ao carregar um caderno, atualiza seu lastModified para a data atual
         if (userData.notebooks && userData.notebooks[activeNotebookId]) {
             userData.notebooks[activeNotebookId].lastModified = Date.now();
-            await saveChanges(false); // Salva essa atualização imediatamente, sem exibir "Salvo!"
+            await saveChanges(false);
         }
-        render(); // A função principal que desenha toda a tela
+        render();
     } else {
-        document.body.innerHTML = '<h1>Erro: Não foi possível carregar os dados do usuário.</h1>';
+        document.body.innerHTML = '<h1>Erro: Não foi possível carregar os dados do utilizador.</h1>';
     }
 }
 
 async function saveChanges(showStatus = true) {
     if (!currentUserId) return;
     if (saveStatusEl && showStatus) {
-        saveStatusEl.textContent = 'Salvando...';
-        saveStatusEl.classList.remove('text-gray-500', 'text-green-600', 'text-red-500'); // Garante que classes anteriores são removidas
+        saveStatusEl.textContent = 'A salvar...';
+        saveStatusEl.classList.remove('text-gray-500', 'text-green-600', 'text-red-500');
         saveStatusEl.classList.add('text-blue-500');
     }
     try {
         const userDocRef = doc(db, "notebooks", currentUserId);
         await setDoc(userDocRef, userData);
-        console.log("Alterações salvas no Firestore.");
         if (saveStatusEl && showStatus) {
             saveStatusEl.textContent = 'Salvo!';
             saveStatusEl.classList.remove('text-blue-500', 'text-red-500');
             saveStatusEl.classList.add('text-green-600');
             setTimeout(() => {
                 saveStatusEl.textContent = '';
-            }, 2000); // Limpa a mensagem após 2 segundos
+            }, 2000);
         }
     } catch (error) {
         console.error("Erro ao salvar dados:", error);
@@ -119,73 +121,130 @@ async function saveChanges(showStatus = true) {
 }
 
 // =================================================================================
-// FUNÇÃO DE RENDERIZAÇÃO PRINCIPAL ("A Mágica Acontece Aqui")
+// FUNÇÕES DE EXPORTAÇÃO
 // =================================================================================
+
+function exportToMarkdown() {
+    if (!activePageId) {
+        showModal('Atenção', 'Por favor, selecione uma página para exportar.', false, () => {});
+        return;
+    }
+    // Inicializa o serviço Turndown
+    const turndownService = new TurndownService();
+    // Para a exportação, juntamos o título e o conteúdo
+    const completeHtml = `<h1>${currentPageTitle.textContent}</h1>${pageContent.innerHTML}`;
+    const markdown = turndownService.turndown(completeHtml);
+    
+    const pageName = currentPageTitle.textContent || 'documento';
+    // Cria um Blob (Binary Large Object) com o conteúdo Markdown
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    // Cria um link temporário para o download
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${pageName.replace(/ /g, '_')}.md`; // Define o nome do ficheiro
+    link.click(); // Simula o clique no link para iniciar o download
+    URL.revokeObjectURL(link.href); // Liberta a memória do URL do objeto
+}
+
+function exportToPDF() {
+    if (!activePageId) {
+        showModal('Atenção', 'Por favor, selecione uma página para exportar.', false, () => {});
+        return;
+    }
+    const { jsPDF } = window.jspdf;
+    const pageName = currentPageTitle.textContent || 'documento';
+
+    saveStatusEl.textContent = 'A gerar PDF...';
+    saveStatusEl.classList.add('text-blue-500');
+
+    // Usa html2canvas para capturar a área de renderização como uma imagem (canvas)
+    html2canvas(pageRenderArea, {
+        scale: 2, // Aumenta a resolução para melhor qualidade
+        useCORS: true
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+            orientation: 'p',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const ratio = canvasWidth / canvasHeight;
+        
+        let imgWidth = pdfWidth;
+        let imgHeight = imgWidth / ratio;
+
+        // Ajusta as dimensões da imagem para caber na página do PDF
+        if (imgHeight > pdfHeight) {
+            imgHeight = pdfHeight;
+            imgWidth = imgHeight * ratio;
+        }
+
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save(`${pageName.replace(/ /g, '_')}.pdf`);
+        
+        saveStatusEl.textContent = 'PDF gerado!';
+        setTimeout(() => { saveStatusEl.textContent = ''; }, 2000);
+    }).catch(err => {
+        console.error("Erro ao gerar PDF:", err);
+        saveStatusEl.textContent = 'Erro ao gerar PDF!';
+        saveStatusEl.classList.add('text-red-500');
+    });
+}
+
+
+// =================================================================================
+// FUNÇÕES DE RENDERIZAÇÃO E GESTÃO
+// =================================================================================
+
 function render() {
     const notebook = userData.notebooks?.[activeNotebookId];
     if (!notebook) {
-        // Se o caderno não existe (ex: foi excluído), redireciona
         window.location.href = 'home.html';
         return;
     }
-
-    // Define os IDs ativos se não estiverem definidos
     const sections = notebook.sections || {};
     if (Object.keys(sections).length > 0 && !sections[activeSectionId]) {
         activeSectionId = Object.keys(sections)[0];
     }
-    // Se não há seções, zera activeSectionId
-    if (Object.keys(sections).length === 0) {
-        activeSectionId = null;
-    }
-
+    if (Object.keys(sections).length === 0) activeSectionId = null;
 
     const activeSection = sections[activeSectionId];
     const pages = activeSection?.pages || {};
     if (Object.keys(pages).length > 0 && !pages[activePageId]) {
         activePageId = Object.keys(pages)[0];
     }
-    // Se não há páginas na seção ativa, zera activePageId
-    if (Object.keys(pages).length === 0) {
-        activePageId = null;
-    }
+    if (Object.keys(pages).length === 0) activePageId = null;
 
-    // Chama as sub-funções para desenhar cada parte da tela
     renderNotebookName(notebook.name);
     renderSectionsList(sections);
     renderPagesList(pages);
     renderPageContent();
-
-    // Desabilita/habilita botões de gerenciar com base na seleção
     toggleManagementButtons();
 }
 
-// --- Sub-funções de Renderização ---
-function renderNotebookName(name) {
-    activeNotebookNameEl.textContent = name;
-}
+function renderNotebookName(name) { activeNotebookNameEl.textContent = name; }
 
 function renderSectionsList(sections) {
     sectionsList.innerHTML = '';
     if (Object.keys(sections).length === 0) {
-        sectionsList.innerHTML = `<p class="text-gray-500 p-2 text-sm">Nenhuma seção.</p>`;
+        sectionsList.innerHTML = `<p class="text-gray-500 p-2 text-sm">Nenhuma secção.</p>`;
         return;
     }
     for (const sectionId in sections) {
         const div = document.createElement('div');
         div.className = `p-2 rounded-md hover:bg-gray-100 cursor-pointer ${activeSectionId === sectionId ? 'active-item' : ''}`;
         div.textContent = sections[sectionId].name;
-        div.dataset.sectionId = sectionId; // Armazena o ID no dataset
+        div.dataset.sectionId = sectionId;
         div.addEventListener('click', () => {
             if (activeSectionId !== sectionId) {
                 activeSectionId = sectionId;
-                activePageId = null; // Reseta a página ao trocar de seção
-                // Atualiza o lastModified do caderno quando uma seção é clicada
-                if (userData.notebooks && userData.notebooks[activeNotebookId]) {
-                    userData.notebooks[activeNotebookId].lastModified = Date.now();
-                    saveChanges(false); // Salva essa atualização
-                }
-                render(); // Redesenha a tela inteira com a nova seleção
+                activePageId = null;
+                render();
             }
         });
         sectionsList.appendChild(div);
@@ -202,16 +261,11 @@ function renderPagesList(pages) {
         const div = document.createElement('div');
         div.className = `p-2 rounded-md hover:bg-gray-100 cursor-pointer ${activePageId === pageId ? 'active-item' : ''}`;
         div.textContent = pages[pageId].name;
-        div.dataset.pageId = pageId; // Armazena o ID no dataset
+        div.dataset.pageId = pageId;
         div.addEventListener('click', () => {
             if (activePageId !== pageId) {
                 activePageId = pageId;
-                // Atualiza o lastModified do caderno quando uma página é clicada
-                if (userData.notebooks && userData.notebooks[activeNotebookId]) {
-                    userData.notebooks[activeNotebookId].lastModified = Date.now();
-                    saveChanges(false); // Salva essa atualização
-                }
-                render(); // Redesenha a tela inteira com a nova seleção
+                render();
             }
         });
         pagesList.appendChild(div);
@@ -224,7 +278,6 @@ function renderPageContent() {
         currentPageTitle.textContent = page.name;
         pageContent.innerHTML = page.content || '';
         pageContent.contentEditable = 'true';
-        pageContent.focus(); // Coloca o foco na área de edição
     } else {
         currentPageTitle.textContent = 'Nenhuma página selecionada';
         pageContent.innerHTML = '<p class="text-gray-400">Selecione uma página ou crie uma nova para começar.</p>';
@@ -233,29 +286,18 @@ function renderPageContent() {
 }
 
 function toggleManagementButtons() {
-    // Botões de Caderno (sempre habilitados nesta página, pois um caderno ativo é obrigatório)
-    if (renameNotebookBtn) renameNotebookBtn.disabled = false;
-    if (deleteNotebookBtn) deleteNotebookBtn.disabled = false;
-
-    // Botões de Seção
-    const hasSections = Object.keys(userData.notebooks?.[activeNotebookId]?.sections || {}).length > 0;
-    if (renameSectionBtn) renameSectionBtn.disabled = !activeSectionId || !hasSections;
-    if (deleteSectionBtn) deleteSectionBtn.disabled = !activeSectionId || !hasSections;
-
-    // Botões de Página
-    const hasPages = Object.keys(userData.notebooks?.[activeNotebookId]?.sections?.[activeSectionId]?.pages || {}).length > 0;
-    if (renamePageBtn) renamePageBtn.disabled = !activePageId || !hasPages;
-    if (deletePageBtn) deletePageBtn.disabled = !activePageId || !hasPages;
+    renameNotebookBtn.disabled = false;
+    deleteNotebookBtn.disabled = false;
+    renameSectionBtn.disabled = !activeSectionId;
+    deleteSectionBtn.disabled = !activeSectionId;
+    renamePageBtn.disabled = !activePageId;
+    deletePageBtn.disabled = !activePageId;
 }
 
-
-// =================================================================================
-// LÓGICA DOS MODAIS E EVENTOS
-// =================================================================================
 function showModal(title, message, showInput, confirmCallback, inputValue = '') {
     modalTitle.textContent = title;
     modalMessage.textContent = message;
-    modalInput.value = inputValue; // Define o valor inicial
+    modalInput.value = inputValue;
     modalInput.classList.toggle('hidden', !showInput);
     confirmationModal.classList.remove('hidden');
     modalConfirmCallback = confirmCallback;
@@ -267,26 +309,38 @@ function hideModal() {
     modalConfirmCallback = null;
 }
 
-// --- Listeners dos Botões de Ação (Adicionar) ---
+// =================================================================================
+// EVENT LISTENERS
+// =================================================================================
+
+// --- NOVOS Event Listeners para Exportação ---
+if (exportMdBtn) {
+    exportMdBtn.addEventListener('click', exportToMarkdown);
+}
+if (exportPdfBtn) {
+    exportPdfBtn.addEventListener('click', exportToPDF);
+}
+
+// --- Listeners de Gestão ---
 addSectionBtn.addEventListener('click', () => {
-    showModal('Criar Nova Seção', 'Qual será o nome da nova seção?', true, async (name) => {
+    showModal('Criar Nova Secção', 'Qual será o nome da nova secção?', true, async (name) => {
         if (name && name.trim() !== "") {
             const id = `section-${Date.now()}`;
             const notebook = userData.notebooks[activeNotebookId];
             if (!notebook.sections) notebook.sections = {};
             notebook.sections[id] = { name: name.trim(), pages: {} };
-            activeSectionId = id; // Ativa a nova seção
-            activePageId = null; // Nenhuma página na nova seção
-            notebook.lastModified = Date.now(); // Atualiza o lastModified ao criar nova seção
+            activeSectionId = id;
+            activePageId = null;
+            notebook.lastModified = Date.now();
             await saveChanges();
-            render(); // Redesenha tudo
+            render();
         }
     });
 });
 
 addPageBtn.addEventListener('click', () => {
     if (!activeSectionId) {
-        showModal('Atenção', 'Por favor, selecione uma seção antes de adicionar uma página.', false, () => {});
+        showModal('Atenção', 'Por favor, selecione uma secção antes de adicionar uma página.', false, () => {});
         return;
     }
     showModal('Criar Nova Página', 'Qual será o nome da nova página?', true, async (name) => {
@@ -295,174 +349,121 @@ addPageBtn.addEventListener('click', () => {
             const section = userData.notebooks[activeNotebookId].sections[activeSectionId];
             if (!section.pages) section.pages = {};
             section.pages[id] = { name: name.trim(), content: '' };
-            activePageId = id; // Ativa a nova página
-            userData.notebooks[activeNotebookId].lastModified = Date.now(); // Atualiza o lastModified ao criar nova página
+            activePageId = id;
+            userData.notebooks[activeNotebookId].lastModified = Date.now();
             await saveChanges();
-            render(); // Redesenha tudo
+            render();
         }
     });
 });
 
-// --- Listeners dos Botões de Gerenciamento (Caderno, Seção, Página) ---
-
-// Renomear Caderno
-if (renameNotebookBtn) {
-    renameNotebookBtn.addEventListener('click', () => {
-        const currentName = userData.notebooks[activeNotebookId].name;
-        showModal('Renomear Caderno', 'Novo nome para o caderno:', true, async (newName) => {
-            if (newName && newName.trim() !== "" && newName.trim() !== currentName) {
-                userData.notebooks[activeNotebookId].name = newName.trim();
-                userData.notebooks[activeNotebookId].lastModified = Date.now();
-                await saveChanges();
-                renderNotebookName(newName.trim()); // Apenas atualiza o nome exibido
-            }
-        }, currentName);
-    });
-}
-
-// Excluir Caderno
-if (deleteNotebookBtn) {
-    deleteNotebookBtn.addEventListener('click', () => {
-        const notebookName = userData.notebooks[activeNotebookId].name;
-        showModal('Excluir Caderno', `Tem certeza que deseja excluir o caderno "${notebookName}" e todo o seu conteúdo?`, false, async (confirm) => {
-            if (confirm) {
-                delete userData.notebooks[activeNotebookId];
-                // Não há lastModified aqui pois o caderno foi excluído.
-                await saveChanges();
-                window.location.href = 'home.html'; // Redireciona para a home após exclusão
-            }
-        });
-    });
-}
-
-// Renomear Seção
-if (renameSectionBtn) {
-    renameSectionBtn.addEventListener('click', () => {
-        if (!activeSectionId) {
-            showModal('Atenção', 'Por favor, selecione uma seção para renomear.', false, () => {});
-            return;
+renameNotebookBtn.addEventListener('click', () => {
+    const currentName = userData.notebooks[activeNotebookId].name;
+    showModal('Renomear Caderno', 'Novo nome para o caderno:', true, async (newName) => {
+        if (newName && newName.trim() !== "" && newName.trim() !== currentName) {
+            userData.notebooks[activeNotebookId].name = newName.trim();
+            userData.notebooks[activeNotebookId].lastModified = Date.now();
+            await saveChanges();
+            renderNotebookName(newName.trim());
         }
-        const currentName = userData.notebooks[activeNotebookId].sections[activeSectionId].name;
-        showModal('Renomear Seção', 'Novo nome para a seção:', true, async (newName) => {
-            if (newName && newName.trim() !== "" && newName.trim() !== currentName) {
-                userData.notebooks[activeNotebookId].sections[activeSectionId].name = newName.trim();
-                userData.notebooks[activeNotebookId].lastModified = Date.now();
-                await saveChanges();
-                render();
-            }
-        }, currentName);
-    });
-}
+    }, currentName);
+});
 
-// Excluir Seção
-if (deleteSectionBtn) {
-    deleteSectionBtn.addEventListener('click', () => {
-        if (!activeSectionId) {
-            showModal('Atenção', 'Por favor, selecione uma seção para excluir.', false, () => {});
-            return;
+deleteNotebookBtn.addEventListener('click', () => {
+    const notebookName = userData.notebooks[activeNotebookId].name;
+    showModal('Excluir Caderno', `Tem a certeza que deseja excluir o caderno "${notebookName}" e todo o seu conteúdo?`, false, async (confirm) => {
+        if (confirm) {
+            delete userData.notebooks[activeNotebookId];
+            await saveChanges();
+            window.location.href = 'home.html';
         }
-        const sectionName = userData.notebooks[activeNotebookId].sections[activeSectionId].name;
-        showModal('Excluir Seção', `Tem certeza que deseja excluir a seção "${sectionName}" e todas as suas páginas?`, false, async (confirm) => {
-            if (confirm) {
-                delete userData.notebooks[activeNotebookId].sections[activeSectionId];
-                userData.notebooks[activeNotebookId].lastModified = Date.now();
-
-                // Após exclusão, tentar selecionar a próxima seção ou a anterior
-                const remainingSectionIds = Object.keys(userData.notebooks[activeNotebookId].sections);
-                if (remainingSectionIds.length > 0) {
-                    activeSectionId = remainingSectionIds[0]; // Seleciona a primeira seção restante
-                } else {
-                    activeSectionId = null; // Nenhuma seção restante
-                    activePageId = null;
-                }
-                await saveChanges();
-                render();
-            }
-        });
     });
-}
+});
 
-// Renomear Página
-if (renamePageBtn) {
-    renamePageBtn.addEventListener('click', () => {
-        if (!activePageId) {
-            showModal('Atenção', 'Por favor, selecione uma página para renomear.', false, () => {});
-            return;
+renameSectionBtn.addEventListener('click', () => {
+    if (!activeSectionId) return;
+    const currentName = userData.notebooks[activeNotebookId].sections[activeSectionId].name;
+    showModal('Renomear Secção', 'Novo nome para a secção:', true, async (newName) => {
+        if (newName && newName.trim() !== "" && newName.trim() !== currentName) {
+            userData.notebooks[activeNotebookId].sections[activeSectionId].name = newName.trim();
+            userData.notebooks[activeNotebookId].lastModified = Date.now();
+            await saveChanges();
+            render();
         }
-        const currentPageName = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name;
-        showModal('Renomear Página', 'Novo nome para a página:', true, async (newName) => {
-            if (newName && newName.trim() !== "" && newName.trim() !== currentPageName) {
-                userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name = newName.trim();
-                userData.notebooks[activeNotebookId].lastModified = Date.now();
-                await saveChanges();
-                render();
-            }
-        }, currentPageName);
-    });
-}
+    }, currentName);
+});
 
-// Excluir Página
-if (deletePageBtn) {
-    deletePageBtn.addEventListener('click', () => {
-        if (!activePageId) {
-            showModal('Atenção', 'Por favor, selecione uma página para excluir.', false, () => {});
-            return;
+deleteSectionBtn.addEventListener('click', () => {
+    if (!activeSectionId) return;
+    const sectionName = userData.notebooks[activeNotebookId].sections[activeSectionId].name;
+    showModal('Excluir Secção', `Tem a certeza que deseja excluir a secção "${sectionName}" e todas as suas páginas?`, false, async (confirm) => {
+        if (confirm) {
+            delete userData.notebooks[activeNotebookId].sections[activeSectionId];
+            userData.notebooks[activeNotebookId].lastModified = Date.now();
+            const remainingSectionIds = Object.keys(userData.notebooks[activeNotebookId].sections);
+            activeSectionId = remainingSectionIds.length > 0 ? remainingSectionIds[0] : null;
+            activePageId = null;
+            await saveChanges();
+            render();
         }
-        const pageName = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name;
-        showModal('Excluir Página', `Tem certeza que deseja excluir a página "${pageName}"?`, false, async (confirm) => {
-            if (confirm) {
-                delete userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId];
-                userData.notebooks[activeNotebookId].lastModified = Date.now();
-
-                // Após exclusão, tentar selecionar a próxima página ou a primeira da seção
-                const remainingPageIds = Object.keys(userData.notebooks[activeNotebookId].sections[activeSectionId].pages);
-                if (remainingPageIds.length > 0) {
-                    activePageId = remainingPageIds[0]; // Seleciona a primeira página restante
-                } else {
-                    activePageId = null; // Nenhuma página restante na seção
-                }
-                await saveChanges();
-                render();
-            }
-        });
     });
-}
+});
 
+renamePageBtn.addEventListener('click', () => {
+    if (!activePageId) return;
+    const currentPageName = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name;
+    showModal('Renomear Página', 'Novo nome para a página:', true, async (newName) => {
+        if (newName && newName.trim() !== "" && newName.trim() !== currentPageName) {
+            userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name = newName.trim();
+            userData.notebooks[activeNotebookId].lastModified = Date.now();
+            await saveChanges();
+            render();
+        }
+    }, currentPageName);
+});
+
+deletePageBtn.addEventListener('click', () => {
+    if (!activePageId) return;
+    const pageName = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name;
+    showModal('Excluir Página', `Tem a certeza que deseja excluir a página "${pageName}"?`, false, async (confirm) => {
+        if (confirm) {
+            delete userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId];
+            userData.notebooks[activeNotebookId].lastModified = Date.now();
+            const remainingPageIds = Object.keys(userData.notebooks[activeNotebookId].sections[activeSectionId].pages);
+            activePageId = remainingPageIds.length > 0 ? remainingPageIds[0] : null;
+            await saveChanges();
+            render();
+        }
+    });
+});
 
 pageContent.addEventListener('input', () => {
-    // Salva o conteúdo 1.5 segundos depois que o usuário para de digitar
     clearTimeout(saveTimeout);
     if (saveStatusEl) {
-        saveStatusEl.textContent = 'Digitando...';
+        saveStatusEl.textContent = 'A digitar...';
         saveStatusEl.classList.remove('text-green-600', 'text-red-500');
         saveStatusEl.classList.add('text-gray-500');
     }
-
     saveTimeout = setTimeout(async () => {
         if (!activePageId || !activeSectionId || !activeNotebookId) return;
         const page = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId];
         if (page.content !== pageContent.innerHTML) {
             page.content = pageContent.innerHTML;
-            userData.notebooks[activeNotebookId].lastModified = Date.now(); // Atualiza o lastModified ao editar conteúdo
+            userData.notebooks[activeNotebookId].lastModified = Date.now();
             await saveChanges();
         } else {
             if (saveStatusEl) {
-                saveStatusEl.textContent = 'Salvo!'; // Se não houve mudança real, apenas indica salvo
+                saveStatusEl.textContent = 'Salvo!';
                 saveStatusEl.classList.remove('text-gray-500');
                 saveStatusEl.classList.add('text-green-600');
-                setTimeout(() => {
-                    saveStatusEl.textContent = '';
-                }, 2000);
+                setTimeout(() => { saveStatusEl.textContent = ''; }, 2000);
             }
         }
     }, 1500);
 });
 
-// Listeners dos botões do modal
 modalConfirmBtn.addEventListener('click', () => {
     if (modalConfirmCallback) {
-        // Se o input não estiver visível, passa true como confirmação (para modais de sim/não)
-        // Caso contrário, passa o valor do input
         const inputValue = modalInput.classList.contains('hidden') ? true : modalInput.value;
         modalConfirmCallback(inputValue);
     }
@@ -471,69 +472,41 @@ modalConfirmBtn.addEventListener('click', () => {
 
 modalCancelBtn.addEventListener('click', hideModal);
 
-// --- Listeners dos botões de formatação de texto (execCommand) ---
-document.execCommand('defaultParagraphSeparator', false, 'p'); // Garante que a quebra de linha seja um <p>
+// --- Listeners de Formatação de Texto ---
+document.execCommand('defaultParagraphSeparator', false, 'p');
 
-// Basic
 if (boldBtn) boldBtn.addEventListener('click', () => document.execCommand('bold'));
 if (italicBtn) italicBtn.addEventListener('click', () => document.execCommand('italic'));
 if (underlineBtn) underlineBtn.addEventListener('click', () => document.execCommand('underline'));
 if (strikethroughBtn) strikethroughBtn.addEventListener('click', () => document.execCommand('strikeThrough'));
 
-// Headings
 if (headingSelect) {
     headingSelect.addEventListener('change', () => {
         document.execCommand('formatBlock', false, headingSelect.value);
-        pageContent.focus(); // Mantém o foco na área de edição
+        pageContent.focus();
     });
 }
 
-// Alignment
 if (alignLeftBtn) alignLeftBtn.addEventListener('click', () => document.execCommand('justifyLeft'));
 if (alignCenterBtn) alignCenterBtn.addEventListener('click', () => document.execCommand('justifyCenter'));
 if (alignRightBtn) alignRightBtn.addEventListener('click', () => document.execCommand('justifyRight'));
 if (alignJustifyBtn) alignJustifyBtn.addEventListener('click', () => document.execCommand('justifyFull'));
 
-// Lists
 if (ulBtn) ulBtn.addEventListener('click', () => document.execCommand('insertUnorderedList'));
 if (olBtn) olBtn.addEventListener('click', () => document.execCommand('insertOrderedList'));
 
-// Clear Formatting
 if (removeFormatBtn) removeFormatBtn.addEventListener('click', () => document.execCommand('removeFormat'));
-
-
-// --- Funcionalidade de seleção de fonte e tamanho ---
-const fontFamilySelect = document.getElementById('font-family-select');
-const fontSizeSelect = document.getElementById('font-size-select');
 
 if (fontFamilySelect) {
     fontFamilySelect.addEventListener('change', () => {
         document.execCommand('fontName', false, fontFamilySelect.value);
-        // Atualiza o lastModified do caderno ao mudar a fonte (com debouncing)
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(async () => {
-            if (activeNotebookId) {
-                userData.notebooks[activeNotebookId].lastModified = Date.now();
-                await saveChanges();
-            }
-        }, 500); // Curto delay para não salvar a cada mudança de fonte
-        pageContent.focus(); // Mantém o foco na área de edição
+        pageContent.focus();
     });
 }
 
 if (fontSizeSelect) {
     fontSizeSelect.addEventListener('change', () => {
-        // execCommand 'fontSize' usa um valor de 1 a 7.
-        // O valor do select é mapeado para esses números.
         document.execCommand('fontSize', false, fontSizeSelect.value);
-        // Atualiza o lastModified do caderno ao mudar o tamanho da fonte (com debouncing)
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(async () => {
-            if (activeNotebookId) {
-                userData.notebooks[activeNotebookId].lastModified = Date.now();
-                await saveChanges();
-            }
-        }, 500); // Curto delay para não salvar a cada mudança de tamanho
-        pageContent.focus(); // Mantém o foco na área de edição
+        pageContent.focus();
     });
 }

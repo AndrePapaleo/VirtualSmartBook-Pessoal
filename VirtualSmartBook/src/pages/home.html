@@ -63,8 +63,31 @@
             </button>
         </section>
 
+        <!-- ================================================================== -->
+        <!-- INÍCIO: Nova Seção de Pesquisa -->
+        <!-- ================================================================== -->
+        <section id="search-section" class="mb-8">
+            <form id="search-form" class="relative">
+                <input type="text" id="search-input" placeholder="Pesquisar em todos os cadernos..." class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-shadow">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </form>
+        </section>
+
+        <section id="search-results-section" class="mb-8 hidden">
+            <h2 class="text-lg sm:text-xl font-semibold section-title mb-5">Resultados da Pesquisa</h2>
+            <div id="search-results-container" class="space-y-4">
+                <!-- Resultados da pesquisa serão inseridos aqui -->
+            </div>
+            <p id="no-search-results-message" class="text-gray-500 col-span-full text-center py-8 text-sm hidden">
+                Nenhum resultado encontrado para a sua pesquisa.
+            </p>
+        </section>
+        <!-- ================================================================== -->
+        <!-- FIM: Nova Seção de Pesquisa -->
+        <!-- ================================================================== -->
+
         <!-- Seção de Documentos Recentes -->
-        <section class="mb-8">
+        <section id="recent-documents-section" class="mb-8">
             <h2 class="text-lg sm:text-xl font-semibold section-title mb-5">Documentos Recentes</h2>
             <div id="recent-documents-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                 <!-- Documentos recentes serão carregados aqui pelo JavaScript como miniaturas -->
@@ -75,7 +98,7 @@
         </section>
 
         <!-- Seção Meus Cadernos -->
-        <section>
+        <section id="my-notebooks-section">
             <h2 class="text-lg sm:text-xl font-semibold section-title mb-5">Meus Cadernos</h2>
             <div id="my-notebooks-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                 <!-- Cadernos serão carregados aqui pelo JavaScript -->
