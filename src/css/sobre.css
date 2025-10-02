@@ -1,0 +1,37 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc; /* Um cinza muito claro para o fundo geral */
+}
+.hero-section {
+    background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 70%, #2563EB 100%);
+}
+.card-icon {
+    background-color: rgba(255, 255, 255, 0.2); /* Fundo translúcido para ícones nos cards azuis */
+}
+.team-member-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+/* Efeito de hover sutil nos cards de valores */
+.value-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+.section-title::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background-color: #2563EB; /* Azul VSB */
+    margin: 10px auto 0;
+}
+.navbar-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
