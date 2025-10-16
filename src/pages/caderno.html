@@ -13,126 +13,119 @@
     <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    </head>
+</head>
 <body class="bg-gray-100 text-gray-800">
-    <div class="flex h-screen">
-        <div class="w-64 bg-white border-r border-gray-200 flex flex-col shadow-lg">
-            <div class="p-4 border-b border-gray-200 text-lg font-semibold text-blue-700">
-            <a href="../pages/home.html"><i class="fas fa-home mr-2"></i>Página Inicial</a>
+    <!-- Container principal agora é uma coluna flexível -->
+    <div class="flex flex-col h-screen">
+        
+        <!-- NOVA BARRA DE TÍTULO SUPERIOR -->
+        <header class="bg-white border-b border-gray-200 p-2 flex items-center justify-between shadow-sm flex-shrink-0">
+            <div class="flex items-center space-x-4">
+                <a href="../pages/home.html" title="Página Inicial" class="text-gray-600 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-home text-lg"></i>
+                </a>
+                <h1 id="active-notebook-name" class="text-lg font-semibold text-gray-800">Carregando...</h1>
             </div>
-            <div id="notebook-info" class="p-4 border-b border-gray-200">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-semibold text-lg text-gray-800" id="active-notebook-name">Carregando...</h3>
-                    <div class="flex space-x-1">
-                        <button id="rename-notebook-btn" title="Renomear Caderno" class="toolbar-icon-btn text-gray-500 hover:text-blue-600">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button id="delete-notebook-btn" title="Excluir Caderno" class="toolbar-icon-btn text-red-500 hover:text-red-600">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                </div>
+            <div class="flex items-center space-x-1">
+                <button id="rename-notebook-btn" title="Renomear Caderno" class="toolbar-icon-btn text-gray-500 hover:text-blue-600">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button id="delete-notebook-btn" title="Excluir Caderno" class="toolbar-icon-btn text-red-500 hover:text-red-600">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             </div>
+        </header>
 
-            <div class="p-4 border-t border-gray-200 text-lg font-semibold text-blue-700 flex justify-between items-center">
-                Secções
-                <div class="flex space-x-2">
-                    <button id="rename-section-btn" title="Renomear Secção" class="toolbar-icon-btn text-gray-500 hover:text-blue-600"><i class="fas fa-edit"></i></button>
-                    <button id="delete-section-btn" title="Excluir Secção" class="toolbar-icon-btn text-red-500 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
-                </div>
+        <!-- Barra de Ferramentas (agora abaixo do novo header) -->
+        <div class="bg-white p-3 border-b border-gray-200 flex items-center justify-between shadow-md flex-wrap gap-y-2 flex-shrink-0">
+            <div class="flex items-center space-x-3 flex-shrink-0">
+                <select id="font-family-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="Inter, sans-serif">Inter</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="Times New Roman, serif">Times New Roman</option>
+                    <option value="Courier New, monospace">Courier New</option>
+                </select>
+                <select id="font-size-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="1">8px</option>
+                    <option value="2">10px</option>
+                    <option value="3">12px</option>
+                    <option value="4">14px</option>
+                    <option value="5">16px</option>
+                    <option value="6">18px</option>
+                    <option value="7">24px</option>
+                </select>
+                <button id="bold-btn" class="toolbar-btn font-bold">B</button>
+                <button id="italic-btn" class="toolbar-btn italic">I</button>
+                <button id="underline-btn" class="toolbar-btn underline">U</button>
+                <button id="strikethrough-btn" class="toolbar-btn"><s>S</s></button>
+                <select id="heading-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="p">Normal</option>
+                    <option value="h1">Título 1</option>
+                    <option value="h2">Título 2</option>
+                    <option value="h3">Título 3</option>
+                </select>
+                <button id="align-left-btn" class="toolbar-btn"><i class="fas fa-align-left"></i></button>
+                <button id="align-center-btn" class="toolbar-btn"><i class="fas fa-align-center"></i></button>
+                <button id="align-right-btn" class="toolbar-btn"><i class="fas fa-align-right"></i></button>
+                <button id="align-justify-btn" class="toolbar-btn"><i class="fas fa-align-justify"></i></button>
+                <button id="ul-btn" class="toolbar-btn"><i class="fas fa-list-ul"></i></button>
+                <button id="ol-btn" class="toolbar-btn"><i class="fas fa-list-ol"></i></button>
+                <button id="remove-format-btn" class="toolbar-btn"><i class="fas fa-eraser"></i></button>
             </div>
-            <div id="sections-list" class="space-y-1 p-2 flex-grow overflow-y-auto"></div>
-            <div class="p-4 border-t border-gray-200">
-                <button id="add-section-btn" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-200 shadow-md">+ Adicionar Secção</button>
-            </div>
-        </div>
-
-        <div class="flex-1 flex flex-col">
-            <!-- Barra de Ferramentas Superior com flex-wrap para quebrar a linha em vez de criar scroll -->
-            <div class="bg-white p-3 border-b border-gray-200 flex items-center justify-between shadow-md flex-wrap gap-y-2">
-                <!-- Grupo Esquerdo: Ferramentas de Edição -->
-                <div class="flex items-center space-x-3 flex-shrink-0">
-                    <select id="font-family-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="Inter, sans-serif">Inter</option>
-                        <option value="Arial, sans-serif">Arial</option>
-                        <option value="Verdana, sans-serif">Verdana</option>
-                        <option value="Georgia, serif">Georgia</option>
-                        <option value="Times New Roman, serif">Times New Roman</option>
-                        <option value="Courier New, monospace">Courier New</option>
-                    </select>
-
-                    <select id="font-size-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="1">8px</option>
-                        <option value="2">10px</option>
-                        <option value="3">12px</option>
-                        <option value="4">14px</option>
-                        <option value="5">16px</option>
-                        <option value="6">18px</option>
-                        <option value="7">24px</option>
-                    </select>
-
-                    <button id="bold-btn" class="toolbar-btn font-bold">B</button>
-                    <button id="italic-btn" class="toolbar-btn italic">I</button>
-                    <button id="underline-btn" class="toolbar-btn underline">U</button>
-                    <button id="strikethrough-btn" class="toolbar-btn"><s>S</s></button>
-
-                    <select id="heading-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="p">Normal</option>
-                        <option value="h1">Título 1</option>
-                        <option value="h2">Título 2</option>
-                        <option value="h3">Título 3</option>
-                    </select>
-
-                    <button id="align-left-btn" class="toolbar-btn"><i class="fas fa-align-left"></i></button>
-                    <button id="align-center-btn" class="toolbar-btn"><i class="fas fa-align-center"></i></button>
-                    <button id="align-right-btn" class="toolbar-btn"><i class="fas fa-align-right"></i></button>
-                    <button id="align-justify-btn" class="toolbar-btn"><i class="fas fa-align-justify"></i></button>
-
-                    <button id="ul-btn" class="toolbar-btn"><i class="fas fa-list-ul"></i></button>
-                    <button id="ol-btn" class="toolbar-btn"><i class="fas fa-list-ol"></i></button>
-
-                    <button id="remove-format-btn" class="toolbar-btn"><i class="fas fa-eraser"></i></button>
-                </div>
-                
-                <!-- Grupo Direito: Exportação e Status -->
-                <div class="flex items-center space-x-3 flex-shrink-0">
-                    <button id="export-md-btn" title="Exportar para Markdown (.md)" class="toolbar-icon-btn text-gray-600 hover:text-blue-600 flex items-center space-x-2 bg-gray-100 px-3 py-1.5 rounded-md">
-                        <i class="fab fa-markdown"></i>
-                        <span>Markdown</span>
-                    </button>
-                    <button id="export-pdf-btn" title="Exportar para PDF" class="toolbar-icon-btn text-gray-600 hover:text-red-600 flex items-center space-x-2 bg-gray-100 px-3 py-1.5 rounded-md">
-                        <i class="fas fa-file-pdf"></i>
-                        <span>PDF</span>
-                    </button>
-                    <span id="save-status" class="w-24 text-right text-sm text-gray-500"></span>
-                </div>
-            </div>
-
-            <div class="flex-1 flex">
-                <div class="w-56 bg-gray-50 border-r border-gray-200 flex flex-col overflow-y-auto">
-                    <div class="p-4 border-b border-gray-200 text-lg font-semibold text-blue-700 flex justify-between items-center">
-                        Páginas
-                        <div class="flex space-x-2">
-                            <button id="rename-page-btn" title="Renomear Página" class="toolbar-icon-btn text-gray-500 hover:text-blue-600"><i class="fas fa-edit"></i></button>
-                            <button id="delete-page-btn" title="Excluir Página" class="toolbar-icon-btn text-red-500 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
-                        </div>
-                    </div>
-                    <div id="pages-list" class="flex-grow space-y-1 p-2"></div>
-                    <div class="p-4 border-t border-gray-200">
-                        <button id="add-page-btn" class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors duration-200 shadow-md">+ Adicionar Página</button>
-                    </div>
-                </div>
-
-                <div class="flex-1 p-6 bg-white overflow-hidden flex flex-col">
-                    <div id="page-render-area" class="flex-1 flex flex-col"> 
-                        <h2 id="current-page-title" class="text-3xl font-bold mb-4 text-gray-900">Selecione uma Página</h2>
-                        <div id="page-content" class="content-editable-area flex-grow border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white shadow-inner" contenteditable="true"></div>
-                    </div>
-                </div>
+            <div class="flex items-center space-x-3 flex-shrink-0">
+                <button id="export-md-btn" title="Exportar para Markdown (.md)" class="toolbar-icon-btn text-gray-600 hover:text-blue-600 flex items-center space-x-2 bg-gray-100 px-3 py-1.5 rounded-md">
+                    <i class="fab fa-markdown"></i>
+                    <span>Markdown</span>
+                </button>
+                <button id="export-pdf-btn" title="Exportar para PDF" class="toolbar-icon-btn text-gray-600 hover:text-red-600 flex items-center space-x-2 bg-gray-100 px-3 py-1.5 rounded-md">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>PDF</span>
+                </button>
+                <span id="save-status" class="w-24 text-right text-sm text-gray-500"></span>
             </div>
         </div>
+
+        <!-- Container principal do conteúdo (ocupa o resto do espaço) -->
+        <main class="flex-1 flex overflow-hidden">
+            <!-- Painel de Seções (Reestruturado) -->
+            <div id="sections-panel" class="w-64 bg-white border-r border-gray-200 flex flex-col">
+                <div class="p-4 border-b border-gray-200 text-lg font-semibold text-blue-700 flex justify-between items-center flex-shrink-0">
+                    <span>Secções</span>
+                    <div class="flex space-x-2">
+                        <button id="add-section-btn" title="Adicionar Secção" class="toolbar-icon-btn text-gray-500 hover:text-green-600"><i class="fas fa-plus"></i></button>
+                        <button id="rename-section-btn" title="Renomear Secção" class="toolbar-icon-btn text-gray-500 hover:text-blue-600"><i class="fas fa-edit"></i></button>
+                        <button id="delete-section-btn" title="Excluir Secção" class="toolbar-icon-btn text-red-500 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <div id="sections-list" class="space-y-1 p-2 flex-grow overflow-y-auto"></div>
+            </div>
+
+            <!-- Painel de Páginas (Reestruturado) -->
+            <div class="w-56 bg-gray-50 border-r border-gray-200 flex flex-col">
+                 <div class="p-4 border-b border-gray-200 text-lg font-semibold text-blue-700 flex justify-between items-center flex-shrink-0">
+                    <span>Páginas</span>
+                    <div class="flex space-x-2">
+                        <button id="add-page-btn" title="Adicionar Página" class="toolbar-icon-btn text-gray-500 hover:text-green-600"><i class="fas fa-plus"></i></button>
+                        <button id="rename-page-btn" title="Renomear Página" class="toolbar-icon-btn text-gray-500 hover:text-blue-600"><i class="fas fa-edit"></i></button>
+                        <button id="delete-page-btn" title="Excluir Página" class="toolbar-icon-btn text-red-500 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <div id="pages-list" class="flex-grow space-y-1 p-2 overflow-y-auto"></div>
+            </div>
+
+            <!-- Área de Edição (Com alterações) -->
+            <div class="flex-1 p-6 bg-white overflow-hidden flex flex-col">
+                <div id="page-render-area" class="flex-1 flex flex-col overflow-y-auto"> 
+                    <h2 id="current-page-title" class="text-3xl font-bold mb-4 text-gray-900">Selecione uma Página</h2>
+                    <!-- classes de borda, foco e sombra removidas daqui -->
+                    <div id="page-content" class="content-editable-area flex-grow bg-white" contenteditable="true"></div>
+                </div>
+            </div>
+        </main>
     </div>
-
+    <!-- Modais e Menus (Sem mudanças) -->
     <div id="confirmation-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded-lg shadow-xl w-96">
             <h3 id="modal-title" class="text-xl font-semibold mb-4">Confirmação</h3>
@@ -150,7 +143,6 @@
         <i class="fas fa-file-alt mr-2"></i>Resumir Texto
     </button>
     </div>
-
 
     <script type="module" src="../js/caderno.js"></script>
 </body>

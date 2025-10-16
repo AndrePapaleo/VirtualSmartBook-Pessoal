@@ -13,19 +13,46 @@
     </head>
 <body class="text-gray-800">
 
-    <nav class="navbar-sticky">
-        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="../../index.html" class="text-2xl font-bold text-blue-700">
                 VSB <span class="font-normal text-gray-700 text-xl">| Virtual Smart Book</span>
             </a>
-            <div class="space-x-4">
-                <a href="../../index.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Início</a>
-                <a href="#" class="text-blue-600 font-semibold px-3 py-2 rounded-md text-sm">Sobre Nós</a>
-                <a href="login.html" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Login</a>
-                <a href="registration.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150">Cadastro</a>
+            <nav class="hidden md:flex space-x-6 items-center">
+                <a href="../../index.html#inicio" class="text-gray-600 hover:text-blue-600 transition duration-300">Início</a>
+                <a href="../../index.html#recursos" class="text-gray-600 hover:text-blue-600 transition duration-300">Recursos</a>
+                <a href="sobre.html" class="text-blue-600 font-semibold transition duration-300">Sobre</a>
+                <a href="../../index.html#contato" class="text-gray-600 hover:text-blue-600 transition duration-300">Contato</a>
+                <a href="../../index.html#ajuda" class="text-gray-600 hover:text-blue-600 transition duration-300">Ajuda</a>
+            </nav>
+            <div class="flex items-center space-x-3">
+                <a href="login.html" class="text-blue-600 hover:text-blue-700 font-medium px-4 py-2 rounded-md transition duration-300">Login</a>
+                <a href="cadastro.html" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md shadow-sm cta-button">Cadastre-se</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-gray-600 hover:text-blue-600 focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
             </div>
         </div>
-    </nav>
+        <div id="mobile-menu" class="md:hidden hidden bg-white shadow-lg">
+            <a href="../../index.html" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-blue-600">Início</a>
+            <a href="../../index.html#recursos" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-blue-600">Recursos</a>
+            <a href="sobre.html" class="block px-6 py-3 text-blue-600 font-semibold bg-gray-100">Sobre</a>
+            <a href="../../index.html#contato" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-blue-600">Contato</a>
+            <a href="../../index.html#ajuda" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-blue-600">Ajuda</a>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const btn = document.getElementById('mobile-menu-button');
+                const menu = document.getElementById('mobile-menu');
+                btn.addEventListener('click', function () {
+                    menu.classList.toggle('hidden');
+                });
+            });
+        </script>
+    </header>
 
     <header class="hero-section text-white py-20 md:py-32">
         <div class="container mx-auto px-6 text-center">
@@ -109,20 +136,20 @@
                 <div class="text-center p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <img src="../../assets/lindo2.png" alt="[Foto de André Rufino]" class="team-member-img rounded-full mx-auto mb-4 border-4 border-blue-200">
                     <h4 class="text-xl font-semibold text-blue-700">André Rufino</h4>
-                    <p class="text-sm text-gray-600">Desenvolvedor Full-Stack</p>
+                    <p class="text-sm text-gray-600">Desenvolvedor Back-End</p>
                 </div>
                 <div class="text-center p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <img src="../../assets/lindo1.png" alt="[Foto de Felipe Cunegundes]" class="team-member-img rounded-full mx-auto mb-4 border-4 border-blue-200">
                     <h4 class="text-xl font-semibold text-blue-700">Felipe Cunegundes</h4>
-                    <p class="text-sm text-gray-600">Especialista em UI/UX</p>
+                    <p class="text-sm text-gray-600">Desenvolvedor Full-Stack</p>
                 </div>
                 <div class="text-center p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <img src="../../assets/lindo4.png" alt="[Foto de Matheus Santos]" class="team-member-img rounded-full mx-auto mb-4 border-4 border-blue-200">
                     <h4 class="text-xl font-semibold text-blue-700">Matheus Santos</h4>
-                    <p class="text-sm text-gray-600">Engenheiro de Software</p>
+                    <p class="text-sm text-gray-600">Desenvolvedor Front-End</p>
                 </div>
                 <div class="text-center p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <img src="../../assets/lindo3.png" alt="[Foto de Murillo Antonio]" class="team-member-img rounded-full mx-auto mb-4 border-4 border-blue-200">
+                    <img src="../../assets/lindo5.png" alt="[Foto de Murillo Antonio]" class="team-member-img rounded-full mx-auto mb-4 border-4 border-blue-200">
                     <h4 class="text-xl font-semibold text-blue-700">Murillo Antonio</h4>
                     <p class="text-sm text-gray-600">Gestor de Projeto</p>
                 </div>

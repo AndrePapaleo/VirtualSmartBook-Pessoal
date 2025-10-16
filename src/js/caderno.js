@@ -26,6 +26,7 @@ const pageRenderArea = document.getElementById('page-render-area'); // Wrapper p
 const customContextMenu = document.getElementById('custom-context-menu');
 const summarizeBtn = document.getElementById('summarize-btn');
 
+
 // --- Elementos do Modal ---
 const confirmationModal = document.getElementById('confirmation-modal');
 const modalTitle = document.getElementById('modal-title');
