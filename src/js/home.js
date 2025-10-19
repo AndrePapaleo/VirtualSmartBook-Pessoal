@@ -10,14 +10,15 @@ const notebookCoverColors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg
 // --- Elementos do DOM ---
 const myNotebooksGrid = document.getElementById('my-notebooks-grid');
 const createNotebookButton = document.getElementById('create-notebook-button');
-const logoutButton = document.getElementById('logout-button'); // Botão de logout do dropdown
+const logoutButton = document.getElementById('logout-button');
 const userMenuButton = document.getElementById('user-menu-button');
 const userMenuDropdown = document.getElementById('user-menu-dropdown');
 const userDisplayName = document.getElementById('user-display-name');
-const noNotebooksMessage = document.getElementById('no-notebooks-message'); // Mensagem quando não há cadernos
-const quoteOfTheDayEl = document.getElementById('quote-of-the-day'); // Elemento para a citação do dia
-const recentDocumentsGrid = document.getElementById('recent-documents-grid'); // Grade de documentos recentes
-const noRecentDocumentsMessage = document.getElementById('no-recent-documents-message'); // Mensagem quando não há documentos recentes
+const noNotebooksMessage = document.getElementById('no-notebooks-message');
+const quoteOfTheDayEl = document.getElementById('quote-of-the-day');
+const recentDocumentsGrid = document.getElementById('recent-documents-grid');
+const noRecentDocumentsMessage = document.getElementById('no-recent-documents-message');
+const profileLink = document.getElementById('profile-link'); // Link para o perfil
 
 // --- Elementos do Modal ---
 const vsbModal = document.getElementById('vsb-modal');
@@ -26,7 +27,7 @@ const vsbModalMessage = document.getElementById('vsb-modal-message');
 const vsbModalInput = document.getElementById('vsb-modal-input');
 const vsbModalCancelBtn = document.getElementById('vsb-modal-cancel-btn');
 const vsbModalConfirmBtn = document.getElementById('vsb-modal-confirm-btn');
-let modalConfirmCallback = null; // Callback para o botão de confirmação do modal
+let modalConfirmCallback = null;
 
 // --- NOVOS Elementos de Pesquisa ---
 const searchForm = document.getElementById('search-form');
@@ -427,6 +428,14 @@ if (userMenuButton) {
     });
 }
 
+// **NOVO** Adicionado o listener para o link do perfil
+if (profileLink) {
+    profileLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'perfil.html';
+    });
+}
+
 document.addEventListener('click', (event) => {
     if (userMenuButton && userMenuDropdown && !userMenuButton.contains(event.target) && !userMenuDropdown.contains(event.target)) {
         userMenuDropdown.classList.add('hidden'); 
@@ -460,7 +469,6 @@ if (searchInput) {
         }
     });
 }
-
 
 const currentYearEl = document.getElementById('currentYear');
 if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();

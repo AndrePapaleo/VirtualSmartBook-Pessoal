@@ -56,7 +56,7 @@
                 <select id="font-size-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
                     <option value="1">8px</option>
                     <option value="2">10px</option>
-                    <option value="3">12px</option>
+                    <option value="3" selected>12px</option>
                     <option value="4">14px</option>
                     <option value="5">16px</option>
                     <option value="6">18px</option>
@@ -84,7 +84,7 @@
                 <button id="ol-btn" class="toolbar-btn"><i class="fas fa-list-ol"></i></button>
                 <button id="remove-format-btn" class="toolbar-btn"><i class="fas fa-eraser"></i></button>
             </div>
-            <div class="flex items-center space-x-3 flex-shrink-0">
+            <div class="flex items-center space-x-4 flex-shrink-0">
                 <button id="view-summaries-btn" title="Ver Resumos Salvos" class="toolbar-icon-btn text-gray-600 hover:text-blue-600 flex items-center space-x-2 bg-gray-100 px-3 py-1.5 rounded-md relative" disabled>
                     <i class="fas fa-list-alt"></i>
                     <span>Resumos</span>
@@ -98,8 +98,15 @@
                     <i class="fas fa-file-pdf"></i>
                     <span>PDF</span>
                 </button>
-                <span id="save-status" class="w-24 text-right text-sm text-gray-500"></span>
-            </div>
+                
+                <div class="flex items-center space-x-3">
+                    <div class="flex items-center space-x-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full" title="Tempo de estudo neste caderno">
+                        <i class="fas fa-clock"></i>
+                        <span id="notebook-chronometer" class="text-sm font-mono font-semibold">00:00:00</span>
+                    </div>
+                    <span id="save-status" class="w-24 text-right text-sm text-gray-500"></span>
+                </div>
+                </div>
         </div>
 
         <main class="flex-1 flex overflow-hidden">
@@ -148,37 +155,27 @@
             </div>
         </div>
     </div>
-    
     <div id="summaries-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-[99]">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
                 <h3 class="text-xl font-semibold">Resumos Salvos</h3>
                 <button id="summaries-modal-close-btn" class="text-gray-500 hover:text-gray-800 text-2xl leading-none">&times;</button>
             </div>
-            <div id="summaries-list-container" class="flex-grow overflow-y-auto pr-2">
-                </div>
+            <div id="summaries-list-container" class="flex-grow overflow-y-auto pr-2"></div>
         </div>
     </div>
-    
     <div id="mind-map-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden z-[98] p-4">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col p-6">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
                 <h3 class="text-xl font-semibold text-gray-800">Mapa Mental Gerado</h3>
                 <button id="mind-map-modal-close-btn" class="text-gray-500 hover:text-gray-800 text-2xl leading-none">&times;</button>
             </div>
-            <div id="mind-map-container" class="flex-grow overflow-auto p-4 mind-map-container">
-                </div>
+            <div id="mind-map-container" class="flex-grow overflow-auto p-4 mind-map-container"></div>
         </div>
     </div>
-
-
     <div id="custom-context-menu" class="hidden absolute z-50 bg-white border border-gray-200 rounded-md shadow-lg py-1">
-        <button id="summarize-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-            <i class="fas fa-file-alt mr-2"></i>Resumir Texto
-        </button>
-        <button id="mind-map-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-            <i class="fas fa-sitemap mr-2"></i>Gerar Mapa Mental
-        </button>
+        <button id="summarize-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-file-alt mr-2"></i>Resumir Texto</button>
+        <button id="mind-map-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-sitemap mr-2"></i>Gerar Mapa Mental</button>
     </div>
 
     <script type="module" src="../js/caderno.js"></script>
