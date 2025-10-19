@@ -7,6 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="../css/caderno.css">
     <script type="module" src="../js/firebase-init.js"></script>
 
@@ -38,6 +43,10 @@
             <div class="flex items-center space-x-3 flex-shrink-0">
                 <select id="font-family-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
                     <option value="Inter, sans-serif">Inter</option>
+                    
+                    <option value="Montserrat, sans-serif">Montserrat</option>
+                    <option value="Lora, serif">Lora</option>
+
                     <option value="Arial, sans-serif">Arial</option>
                     <option value="Verdana, sans-serif">Verdana</option>
                     <option value="Georgia, serif">Georgia</option>
@@ -53,6 +62,10 @@
                     <option value="6">18px</option>
                     <option value="7">24px</option>
                 </select>
+
+                <input type="color" id="text-color-picker" class="color-picker-btn" title="Cor do Texto" value="#000000">
+                <input type="color" id="highlight-color-picker" class="color-picker-btn" title="Cor do Destaque" value="#FFFF00">
+
                 <button id="bold-btn" class="toolbar-btn font-bold">B</button>
                 <button id="italic-btn" class="toolbar-btn italic">I</button>
                 <button id="underline-btn" class="toolbar-btn underline">U</button>

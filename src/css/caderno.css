@@ -49,7 +49,7 @@ body {
 }
 
 /* ================================================================== */
-/* UTILITÁRIOS E BOTÕES                                               */
+/* UTILITÁRIOS E BOTÕES                                             */
 /* ================================================================== */
 .toolbar-icon-btn {
     padding: 0.5rem;
@@ -62,6 +62,37 @@ body {
 .toolbar-icon-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* Estilo para os novos seletores de cor */
+.color-picker-btn {
+    /* Remove a aparência padrão do navegador */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    
+    /* Define um tamanho similar aos outros botões */
+    width: 36px;
+    height: 36px;
+
+    /* Estilização da borda e fundo */
+    background-color: transparent;
+    border: 1px solid #D1D5DB; /* Cor cinza do Tailwind que você já usa */
+    border-radius: 0.375rem;   /* Equivalente a 'rounded-md' do Tailwind */
+    cursor: pointer;
+    padding: 4px;
+}
+
+/* Estiliza a "amostra" de cor dentro do botão para navegadores Chrome/Edge */
+.color-picker-btn::-webkit-color-swatch {
+    border-radius: 0.25rem;
+    border: none;
+}
+
+/* Estiliza a "amostra" de cor dentro do botão para Firefox */
+.color-picker-btn::-moz-color-swatch {
+    border-radius: 0.25rem;
+    border: none;
 }
 
 /* Estilização da barra de rolagem */

@@ -68,6 +68,11 @@ const removeFormatBtn = document.getElementById('remove-format-btn');
 const fontFamilySelect = document.getElementById('font-family-select');
 const fontSizeSelect = document.getElementById('font-size-select');
 
+// NOVOS ELEMENTOS DE COR ADICIONADOS AQUI
+const textColorPicker = document.getElementById('text-color-picker');
+const highlightColorPicker = document.getElementById('highlight-color-picker');
+
+
 // --- Botões de Gestão ---
 const renameNotebookBtn = document.getElementById('rename-notebook-btn');
 const deleteNotebookBtn = document.getElementById('delete-notebook-btn');
