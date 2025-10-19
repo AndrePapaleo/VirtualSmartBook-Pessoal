@@ -12,7 +12,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyBnRZX6vm3V3IidlaewRKbUkzNKhDuMYxM",
     authDomain: "vsb-first.firebaseapp.com",
     projectId: "vsb-first",
-    storageBucket: "vsb-first.firebasestorage.app", // Verifique se este é o bucket correto no seu projeto Firebase
+    storageBucket: "vsb-first.firebasestorage.app",
     messagingSenderId: "153261737604",
     appId: "1:153261737604:web:5fa49e2c7c53ed99d5a4d1",
     measurementId: "G-DJBSLEKDDC"
