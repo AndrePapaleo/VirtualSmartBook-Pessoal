@@ -1,21 +1,24 @@
 import { auth, db } from './firebase-init.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-functions.js";
 
 
 // --- Variáveis de Estado Globais ---
 const functions = getFunctions();
 const summarizeText = httpsCallable(functions, 'summarizeText');
-const generateMindMap = httpsCallable(functions, 'generateMindMap'); // Nova função
+const generateMindMap = httpsCallable(functions, 'generateMindMap');
 let userData = {};
 let currentUserId = null;
 let activeNotebookId = null;
 let activeSectionId = null;
 let activePageId = null;
 let saveTimeout = null;
+let studyTimeInterval = null; // Cronômetro para o tempo total do usuário
+let notebookChronometerInterval = null; // Cronômetro para o caderno específico
 
 // --- Elementos do DOM ---
+const chronometerDisplayEl = document.getElementById('notebook-chronometer');
 const activeNotebookNameEl = document.getElementById('active-notebook-name');
 const sectionsList = document.getElementById('sections-list');
 const pagesList = document.getElementById('pages-list');
@@ -26,9 +29,7 @@ const currentPageTitle = document.getElementById('current-page-title');
 const pageRenderArea = document.getElementById('page-render-area');
 const customContextMenu = document.getElementById('custom-context-menu');
 const summarizeBtn = document.getElementById('summarize-btn');
-const mindMapBtn = document.getElementById('mind-map-btn'); // Novo botão
-
-// --- Elementos do Modal de Confirmação ---
+const mindMapBtn = document.getElementById('mind-map-btn');
 const confirmationModal = document.getElementById('confirmation-modal');
 const modalTitle = document.getElementById('modal-title');
 const modalMessage = document.getElementById('modal-message');
@@ -38,20 +39,14 @@ const modalConfirmBtn = document.getElementById('modal-confirm-btn');
 const modalButtons = document.getElementById('modal-buttons');
 const modalSpinner = document.getElementById('modal-spinner');
 let modalConfirmCallback = null;
-
-// --- Elementos do Modal de Resumos ---
 const viewSummariesBtn = document.getElementById('view-summaries-btn');
 const summariesCountBadge = document.getElementById('summaries-count-badge');
 const summariesModal = document.getElementById('summaries-modal');
 const summariesModalCloseBtn = document.getElementById('summaries-modal-close-btn');
 const summariesListContainer = document.getElementById('summaries-list-container');
-
-// --- Elementos do Modal de Mapa Mental ---
 const mindMapModal = document.getElementById('mind-map-modal');
 const mindMapModalCloseBtn = document.getElementById('mind-map-modal-close-btn');
 const mindMapContainer = document.getElementById('mind-map-container');
-
-// --- Elementos da Toolbar ---
 const saveStatusEl = document.getElementById('save-status');
 const boldBtn = document.getElementById('bold-btn');
 const italicBtn = document.getElementById('italic-btn');
@@ -67,16 +62,12 @@ const olBtn = document.getElementById('ol-btn');
 const removeFormatBtn = document.getElementById('remove-format-btn');
 const fontFamilySelect = document.getElementById('font-family-select');
 const fontSizeSelect = document.getElementById('font-size-select');
-
-// --- Botões de Gestão ---
 const renameNotebookBtn = document.getElementById('rename-notebook-btn');
 const deleteNotebookBtn = document.getElementById('delete-notebook-btn');
 const renameSectionBtn = document.getElementById('rename-section-btn');
 const deleteSectionBtn = document.getElementById('delete-section-btn');
 const renamePageBtn = document.getElementById('rename-page-btn');
 const deletePageBtn = document.getElementById('delete-page-btn');
-
-// --- Botões de Exportação ---
 const exportMdBtn = document.getElementById('export-md-btn');
 const exportPdfBtn = document.getElementById('export-pdf-btn');
 
@@ -94,10 +85,67 @@ onAuthStateChanged(auth, (user) => {
             return;
         }
         loadInitialData();
+        startStudyTimeTracker(); // Continua rastreando o tempo total do usuário
     } else {
         window.location.href = 'login.html';
     }
 });
+
+// Função para rastrear o tempo de estudo TOTAL do usuário
+function startStudyTimeTracker() {
+    if (studyTimeInterval) clearInterval(studyTimeInterval);
+    studyTimeInterval = setInterval(() => {
+        if (!currentUserId) return;
+        const userDocRef = doc(db, "notebooks", currentUserId);
+        updateDoc(userDocRef, { totalStudyTimeInSeconds: increment(60) })
+            .catch(err => {
+                if (err.code === 'not-found' || err.message.includes("No document to update")) {
+                    setDoc(userDocRef, { totalStudyTimeInSeconds: 60 }, { merge: true });
+                }
+            });
+    }, 60000);
+}
+
+// Função para o cronômetro do caderno específico
+function startNotebookChronometer() {
+    if (notebookChronometerInterval) clearInterval(notebookChronometerInterval);
+
+    const notebook = userData.notebooks[activeNotebookId];
+    if (!notebook) return;
+
+    let notebookSeconds = notebook.studyTimeInSeconds || 0;
+    
+    // Atualiza a tela imediatamente com o valor salvo
+    if (chronometerDisplayEl) {
+        chronometerDisplayEl.textContent = formatTime(notebookSeconds);
+    }
+
+    // Inicia o contador
+    notebookChronometerInterval = setInterval(() => {
+        notebookSeconds++;
+        
+        if (chronometerDisplayEl) {
+            chronometerDisplayEl.textContent = formatTime(notebookSeconds);
+        }
+
+        if (notebookSeconds % 60 === 0) {
+            const notebookRef = `notebooks.${activeNotebookId}.studyTimeInSeconds`;
+            const userDocRef = doc(db, "notebooks", currentUserId);
+            updateDoc(userDocRef, { [notebookRef]: notebookSeconds })
+                .catch(err => {
+                    console.error("Erro ao salvar tempo do caderno:", err);
+                });
+        }
+    }, 1000);
+}
+
+// Função para formatar segundos em HH:MM:SS
+function formatTime(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+    const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+}
 
 async function loadInitialData() {
     const userDocRef = doc(db, "notebooks", currentUserId);
@@ -107,6 +155,7 @@ async function loadInitialData() {
         if (userData.notebooks && userData.notebooks[activeNotebookId]) {
             userData.notebooks[activeNotebookId].lastModified = Date.now();
             await saveChanges(false);
+            startNotebookChronometer();
         }
         render();
     } else {
@@ -123,7 +172,7 @@ async function saveChanges(showStatus = true) {
     }
     try {
         const userDocRef = doc(db, "notebooks", currentUserId);
-        await setDoc(userDocRef, userData);
+        await setDoc(userDocRef, userData, { merge: true });
         if (saveStatusEl && showStatus) {
             saveStatusEl.textContent = 'Salvo!';
             saveStatusEl.classList.remove('text-blue-500', 'text-red-500');
@@ -300,7 +349,6 @@ function renderPageContent() {
         pageContent.contentEditable = 'false';
     }
 
-    // Atualiza o estado do botão de resumos
     if (page && page.summaries && page.summaries.length > 0) {
         viewSummariesBtn.disabled = false;
         summariesCountBadge.textContent = page.summaries.length;
@@ -357,7 +405,7 @@ function hideModal() {
 function renderSummariesList() {
     if (!activePageId) return;
     const page = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId];
-    summariesListContainer.innerHTML = ''; // Limpa a lista
+    summariesListContainer.innerHTML = '';
 
     if (!page.summaries || page.summaries.length === 0) {
         summariesListContainer.innerHTML = '<p class="text-gray-500">Nenhum resumo salvo para esta página.</p>';
@@ -389,7 +437,6 @@ function renderSummariesList() {
     });
 }
 
-// Converte markdown de lista para HTML de lista aninhada
 function markdownListToHtml(markdown) {
     const lines = markdown.split('\n').filter(line => line.trim() !== '');
     let html = '<ul>';
@@ -397,17 +444,16 @@ function markdownListToHtml(markdown) {
 
     lines.forEach(line => {
         const trimmedLine = line.trim();
-        const currentLevel = (line.match(/^\s*/)[0].length) / 2; // Calcula o nível pelo recuo
+        const currentLevel = (line.match(/^\s*/)[0].length) / 2;
         const content = trimmedLine.replace(/^- \s*/, '');
 
         if (currentLevel > level) {
             html += '<ul>'.repeat(currentLevel - level);
         } else if (currentLevel < level) {
             html += '</li></ul>'.repeat(level - currentLevel) + '</li>';
-        } else if (level > 0 && html.endsWith('</li>') === false) {
+        } else if (level > 0 && !html.endsWith('</li>')) {
              html += '</li>';
         }
-
 
         html += `<li>${content}`;
         level = currentLevel;
@@ -450,9 +496,7 @@ if (mindMapBtn) {
 
                     if (activePageId) {
                         const page = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId];
-                        if (!page.mindMaps) {
-                            page.mindMaps = [];
-                        }
+                        if (!page.mindMaps) page.mindMaps = [];
                         page.mindMaps.push({
                             createdAt: Date.now(),
                             originalText: selectedText,
@@ -513,7 +557,7 @@ addPageBtn.addEventListener('click', () => {
                 const id = `page-${Date.now()}`;
                 const section = userData.notebooks[activeNotebookId].sections[activeSectionId];
                 if (!section.pages) section.pages = {};
-                section.pages[id] = { name: name.trim(), content: '', summaries: [], mindMaps: [] }; // Adicionado array de mapas mentais
+                section.pages[id] = { name: name.trim(), content: '', summaries: [], mindMaps: [] };
                 activePageId = id;
                 userData.notebooks[activeNotebookId].lastModified = Date.now();
                 await saveChanges();
@@ -725,7 +769,7 @@ summarizeBtn.addEventListener('click', () => {
                         summaryText: summary
                     });
                     await saveChanges();
-                    renderPageContent(); // Atualiza a UI para mostrar o contador de resumos
+                    renderPageContent();
                 }
                 hideModal();
                 showModal('Resumo Gerado pela IA', summary, { 
