@@ -7,12 +7,13 @@ import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/
 // --- Variáveis de Estado Globais ---
 const functions = getFunctions();
 const summarizeText = httpsCallable(functions, 'summarizeText');
+const generateMindMap = httpsCallable(functions, 'generateMindMap'); // Nova função
 let userData = {};
 let currentUserId = null;
 let activeNotebookId = null;
 let activeSectionId = null;
 let activePageId = null;
-let saveTimeout = null; 
+let saveTimeout = null;
 
 // --- Elementos do DOM ---
 const activeNotebookNameEl = document.getElementById('active-notebook-name');
@@ -22,19 +23,33 @@ const addSectionBtn = document.getElementById('add-section-btn');
 const addPageBtn = document.getElementById('add-page-btn');
 const pageContent = document.getElementById('page-content');
 const currentPageTitle = document.getElementById('current-page-title');
-const pageRenderArea = document.getElementById('page-render-area'); // Wrapper para exportação
+const pageRenderArea = document.getElementById('page-render-area');
 const customContextMenu = document.getElementById('custom-context-menu');
 const summarizeBtn = document.getElementById('summarize-btn');
+const mindMapBtn = document.getElementById('mind-map-btn'); // Novo botão
 
-
-// --- Elementos do Modal ---
+// --- Elementos do Modal de Confirmação ---
 const confirmationModal = document.getElementById('confirmation-modal');
 const modalTitle = document.getElementById('modal-title');
 const modalMessage = document.getElementById('modal-message');
 const modalInput = document.getElementById('modal-input');
 const modalCancelBtn = document.getElementById('modal-cancel-btn');
 const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+const modalButtons = document.getElementById('modal-buttons');
+const modalSpinner = document.getElementById('modal-spinner');
 let modalConfirmCallback = null;
+
+// --- Elementos do Modal de Resumos ---
+const viewSummariesBtn = document.getElementById('view-summaries-btn');
+const summariesCountBadge = document.getElementById('summaries-count-badge');
+const summariesModal = document.getElementById('summaries-modal');
+const summariesModalCloseBtn = document.getElementById('summaries-modal-close-btn');
+const summariesListContainer = document.getElementById('summaries-list-container');
+
+// --- Elementos do Modal de Mapa Mental ---
+const mindMapModal = document.getElementById('mind-map-modal');
+const mindMapModalCloseBtn = document.getElementById('mind-map-modal-close-btn');
+const mindMapContainer = document.getElementById('mind-map-container');
 
 // --- Elementos da Toolbar ---
 const saveStatusEl = document.getElementById('save-status');
@@ -61,7 +76,7 @@ const deleteSectionBtn = document.getElementById('delete-section-btn');
 const renamePageBtn = document.getElementById('rename-page-btn');
 const deletePageBtn = document.getElementById('delete-page-btn');
 
-// --- NOVOS Botões de Exportação ---
+// --- Botões de Exportação ---
 const exportMdBtn = document.getElementById('export-md-btn');
 const exportPdfBtn = document.getElementById('export-pdf-btn');
 
@@ -133,29 +148,25 @@ async function saveChanges(showStatus = true) {
 
 function exportToMarkdown() {
     if (!activePageId) {
-        showModal('Atenção', 'Por favor, selecione uma página para exportar.', false, () => {});
+        showModal('Atenção', 'Por favor, selecione uma página para exportar.', { showCancelButton: false, confirmText: 'OK' });
         return;
     }
-    // Inicializa o serviço Turndown
     const turndownService = new TurndownService();
-    // Para a exportação, juntamos o título e o conteúdo
     const completeHtml = `<h1>${currentPageTitle.textContent}</h1>${pageContent.innerHTML}`;
     const markdown = turndownService.turndown(completeHtml);
     
     const pageName = currentPageTitle.textContent || 'documento';
-    // Cria um Blob (Binary Large Object) com o conteúdo Markdown
     const blob = new Blob([markdown], { type: 'text/markdown' });
-    // Cria um link temporário para o download
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `${pageName.replace(/ /g, '_')}.md`; // Define o nome do ficheiro
-    link.click(); // Simula o clique no link para iniciar o download
-    URL.revokeObjectURL(link.href); // Liberta a memória do URL do objeto
+    link.download = `${pageName.replace(/ /g, '_')}.md`;
+    link.click();
+    URL.revokeObjectURL(link.href);
 }
 
 function exportToPDF() {
     if (!activePageId) {
-        showModal('Atenção', 'Por favor, selecione uma página para exportar.', false, () => {});
+        showModal('Atenção', 'Por favor, selecione uma página para exportar.', { showCancelButton: false, confirmText: 'OK' });
         return;
     }
     const { jsPDF } = window.jspdf;
@@ -164,9 +175,8 @@ function exportToPDF() {
     saveStatusEl.textContent = 'A gerar PDF...';
     saveStatusEl.classList.add('text-blue-500');
 
-    // Usa html2canvas para capturar a área de renderização como uma imagem (canvas)
     html2canvas(pageRenderArea, {
-        scale: 2, // Aumenta a resolução para melhor qualidade
+        scale: 2,
         useCORS: true
     }).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
@@ -185,7 +195,6 @@ function exportToPDF() {
         let imgWidth = pdfWidth;
         let imgHeight = imgWidth / ratio;
 
-        // Ajusta as dimensões da imagem para caber na página do PDF
         if (imgHeight > pdfHeight) {
             imgHeight = pdfHeight;
             imgWidth = imgHeight * ratio;
@@ -290,6 +299,16 @@ function renderPageContent() {
         pageContent.innerHTML = '<p class="text-gray-400">Selecione uma página ou crie uma nova para começar.</p>';
         pageContent.contentEditable = 'false';
     }
+
+    // Atualiza o estado do botão de resumos
+    if (page && page.summaries && page.summaries.length > 0) {
+        viewSummariesBtn.disabled = false;
+        summariesCountBadge.textContent = page.summaries.length;
+        summariesCountBadge.classList.remove('hidden');
+    } else {
+        viewSummariesBtn.disabled = true;
+        summariesCountBadge.classList.add('hidden');
+    }
 }
 
 function toggleManagementButtons() {
@@ -301,19 +320,101 @@ function toggleManagementButtons() {
     deletePageBtn.disabled = !activePageId;
 }
 
-function showModal(title, message, showInput, confirmCallback, inputValue = '') {
+function showModal(title, message, options = {}) {
+    const {
+        showInput = false,
+        inputValue = '',
+        showSpinner = false,
+        showButtons = true,
+        showCancelButton = true,
+        confirmText = 'Confirmar',
+        confirmCallback = null
+    } = options;
+
     modalTitle.textContent = title;
     modalMessage.textContent = message;
     modalInput.value = inputValue;
+
     modalInput.classList.toggle('hidden', !showInput);
+    modalSpinner.classList.toggle('hidden', !showSpinner);
+    modalButtons.classList.toggle('hidden', !showButtons);
+    modalCancelBtn.classList.toggle('hidden', !showCancelButton);
+    
+    modalConfirmBtn.textContent = confirmText;
+    
     confirmationModal.classList.remove('hidden');
     modalConfirmCallback = confirmCallback;
-    if(showInput) modalInput.focus();
+
+    if (showInput) modalInput.focus();
 }
+
 
 function hideModal() {
     confirmationModal.classList.add('hidden');
     modalConfirmCallback = null;
+}
+
+function renderSummariesList() {
+    if (!activePageId) return;
+    const page = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId];
+    summariesListContainer.innerHTML = ''; // Limpa a lista
+
+    if (!page.summaries || page.summaries.length === 0) {
+        summariesListContainer.innerHTML = '<p class="text-gray-500">Nenhum resumo salvo para esta página.</p>';
+        return;
+    }
+
+    const sortedSummaries = [...page.summaries].sort((a, b) => b.createdAt - a.createdAt);
+
+    sortedSummaries.forEach(summaryData => {
+        const summaryEl = document.createElement('div');
+        summaryEl.className = 'border-b border-gray-200 py-4';
+
+        const formattedDate = new Date(summaryData.createdAt).toLocaleString('pt-BR', {
+            dateStyle: 'short',
+            timeStyle: 'short'
+        });
+
+        summaryEl.innerHTML = `
+            <p class="text-xs text-gray-500 mb-2">Gerado em: ${formattedDate}</p>
+            <p class="text-gray-800 whitespace-pre-wrap">${summaryData.summaryText}</p>
+            <details class="mt-3 text-sm">
+                <summary class="cursor-pointer text-blue-600 hover:underline">Mostrar texto original</summary>
+                <blockquote class="mt-2 p-3 bg-gray-50 border-l-4 border-gray-300 text-gray-600 italic">
+                    ${summaryData.originalText}
+                </blockquote>
+            </details>
+        `;
+        summariesListContainer.appendChild(summaryEl);
+    });
+}
+
+// Converte markdown de lista para HTML de lista aninhada
+function markdownListToHtml(markdown) {
+    const lines = markdown.split('\n').filter(line => line.trim() !== '');
+    let html = '<ul>';
+    let level = 0;
+
+    lines.forEach(line => {
+        const trimmedLine = line.trim();
+        const currentLevel = (line.match(/^\s*/)[0].length) / 2; // Calcula o nível pelo recuo
+        const content = trimmedLine.replace(/^- \s*/, '');
+
+        if (currentLevel > level) {
+            html += '<ul>'.repeat(currentLevel - level);
+        } else if (currentLevel < level) {
+            html += '</li></ul>'.repeat(level - currentLevel) + '</li>';
+        } else if (level > 0 && html.endsWith('</li>') === false) {
+             html += '</li>';
+        }
+
+
+        html += `<li>${content}`;
+        level = currentLevel;
+    });
+
+    html += '</li></ul>'.repeat(level + 1);
+    return html.replace(/<\/li><\/ul><\/li>/g, '</li></ul>');
 }
 
 
@@ -322,69 +423,131 @@ function hideModal() {
 // EVENT LISTENERS
 // =================================================================================
 
-// --- NOVOS Event Listeners para Exportação ---
-if (exportMdBtn) {
-    exportMdBtn.addEventListener('click', exportToMarkdown);
+if (exportMdBtn) exportMdBtn.addEventListener('click', exportToMarkdown);
+if (exportPdfBtn) exportPdfBtn.addEventListener('click', exportToPDF);
+
+if (viewSummariesBtn) {
+    viewSummariesBtn.addEventListener('click', () => {
+        renderSummariesList();
+        summariesModal.classList.remove('hidden');
+    });
 }
-if (exportPdfBtn) {
-    exportPdfBtn.addEventListener('click', exportToPDF);
+if (summariesModalCloseBtn) {
+    summariesModalCloseBtn.addEventListener('click', () => {
+        summariesModal.classList.add('hidden');
+    });
 }
+
+if (mindMapBtn) {
+    mindMapBtn.addEventListener('click', () => {
+        const selectedText = window.getSelection().toString().trim();
+        if (selectedText) {
+            showModal('Gerando Mapa Mental', 'Aguarde, estamos organizando as ideias...', { showButtons: false, showSpinner: true });
+
+            generateMindMap({ text: selectedText })
+                .then(async (result) => {
+                    const mindMapData = result.data.mindMapData;
+
+                    if (activePageId) {
+                        const page = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId];
+                        if (!page.mindMaps) {
+                            page.mindMaps = [];
+                        }
+                        page.mindMaps.push({
+                            createdAt: Date.now(),
+                            originalText: selectedText,
+                            mapData: mindMapData
+                        });
+                        await saveChanges();
+                    }
+
+                    hideModal();
+                    mindMapContainer.innerHTML = markdownListToHtml(mindMapData);
+                    mindMapModal.classList.remove('hidden');
+                })
+                .catch((error) => {
+                    hideModal();
+                    showModal('Erro', 'Não foi possível gerar o mapa mental.', { showCancelButton: false, confirmText: 'Fechar' });
+                });
+        }
+        customContextMenu.classList.add('hidden');
+    });
+}
+
+if (mindMapModalCloseBtn) {
+    mindMapModalCloseBtn.addEventListener('click', () => {
+        mindMapModal.classList.add('hidden');
+    });
+}
+
 
 // --- Listeners de Gestão ---
 addSectionBtn.addEventListener('click', () => {
-    showModal('Criar Nova Secção', 'Qual será o nome da nova secção?', true, async (name) => {
-        if (name && name.trim() !== "") {
-            const id = `section-${Date.now()}`;
-            const notebook = userData.notebooks[activeNotebookId];
-            if (!notebook.sections) notebook.sections = {};
-            notebook.sections[id] = { name: name.trim(), pages: {} };
-            activeSectionId = id;
-            activePageId = null;
-            notebook.lastModified = Date.now();
-            await saveChanges();
-            render();
+    showModal('Criar Nova Secção', 'Qual será o nome da nova secção?', {
+        showInput: true,
+        confirmCallback: async (name) => {
+            if (name && name.trim() !== "") {
+                const id = `section-${Date.now()}`;
+                const notebook = userData.notebooks[activeNotebookId];
+                if (!notebook.sections) notebook.sections = {};
+                notebook.sections[id] = { name: name.trim(), pages: {} };
+                activeSectionId = id;
+                activePageId = null;
+                notebook.lastModified = Date.now();
+                await saveChanges();
+                render();
+            }
         }
     });
 });
 
 addPageBtn.addEventListener('click', () => {
     if (!activeSectionId) {
-        showModal('Atenção', 'Por favor, selecione uma secção antes de adicionar uma página.', false, () => {});
+        showModal('Atenção', 'Por favor, selecione uma secção antes de adicionar uma página.', { showCancelButton: false, confirmText: 'OK' });
         return;
     }
-    showModal('Criar Nova Página', 'Qual será o nome da nova página?', true, async (name) => {
-        if (name && name.trim() !== "") {
-            const id = `page-${Date.now()}`;
-            const section = userData.notebooks[activeNotebookId].sections[activeSectionId];
-            if (!section.pages) section.pages = {};
-            section.pages[id] = { name: name.trim(), content: '' };
-            activePageId = id;
-            userData.notebooks[activeNotebookId].lastModified = Date.now();
-            await saveChanges();
-            render();
+    showModal('Criar Nova Página', 'Qual será o nome da nova página?', {
+        showInput: true,
+        confirmCallback: async (name) => {
+            if (name && name.trim() !== "") {
+                const id = `page-${Date.now()}`;
+                const section = userData.notebooks[activeNotebookId].sections[activeSectionId];
+                if (!section.pages) section.pages = {};
+                section.pages[id] = { name: name.trim(), content: '', summaries: [], mindMaps: [] }; // Adicionado array de mapas mentais
+                activePageId = id;
+                userData.notebooks[activeNotebookId].lastModified = Date.now();
+                await saveChanges();
+                render();
+            }
         }
     });
 });
 
 renameNotebookBtn.addEventListener('click', () => {
     const currentName = userData.notebooks[activeNotebookId].name;
-    showModal('Renomear Caderno', 'Novo nome para o caderno:', true, async (newName) => {
-        if (newName && newName.trim() !== "" && newName.trim() !== currentName) {
-            userData.notebooks[activeNotebookId].name = newName.trim();
-            userData.notebooks[activeNotebookId].lastModified = Date.now();
-            await saveChanges();
-            renderNotebookName(newName.trim());
+    showModal('Renomear Caderno', 'Novo nome para o caderno:', {
+        showInput: true,
+        inputValue: currentName,
+        confirmCallback: async (newName) => {
+            if (newName && newName.trim() !== "" && newName.trim() !== currentName) {
+                userData.notebooks[activeNotebookId].name = newName.trim();
+                userData.notebooks[activeNotebookId].lastModified = Date.now();
+                await saveChanges();
+                renderNotebookName(newName.trim());
+            }
         }
-    }, currentName);
+    });
 });
 
 deleteNotebookBtn.addEventListener('click', () => {
     const notebookName = userData.notebooks[activeNotebookId].name;
-    showModal('Excluir Caderno', `Tem a certeza que deseja excluir o caderno "${notebookName}" e todo o seu conteúdo?`, false, async (confirm) => {
-        if (confirm) {
-            delete userData.notebooks[activeNotebookId];
-            await saveChanges();
-            window.location.href = 'home.html';
+    showModal('Excluir Caderno', `Tem a certeza que deseja excluir o caderno "${notebookName}" e todo o seu conteúdo?`, {
+        confirmCallback: async (confirm) => {
+            if (confirm) {
+                delete userData.notebooks[activeNotebookId];
+                await saveChanges();
+                window.location.href = 'home.html';
+            }
         }
     });
 });
@@ -392,28 +555,34 @@ deleteNotebookBtn.addEventListener('click', () => {
 renameSectionBtn.addEventListener('click', () => {
     if (!activeSectionId) return;
     const currentName = userData.notebooks[activeNotebookId].sections[activeSectionId].name;
-    showModal('Renomear Secção', 'Novo nome para a secção:', true, async (newName) => {
-        if (newName && newName.trim() !== "" && newName.trim() !== currentName) {
-            userData.notebooks[activeNotebookId].sections[activeSectionId].name = newName.trim();
-            userData.notebooks[activeNotebookId].lastModified = Date.now();
-            await saveChanges();
-            render();
+    showModal('Renomear Secção', 'Novo nome para a secção:', {
+        showInput: true,
+        inputValue: currentName,
+        confirmCallback: async (newName) => {
+            if (newName && newName.trim() !== "" && newName.trim() !== currentName) {
+                userData.notebooks[activeNotebookId].sections[activeSectionId].name = newName.trim();
+                userData.notebooks[activeNotebookId].lastModified = Date.now();
+                await saveChanges();
+                render();
+            }
         }
-    }, currentName);
+    });
 });
 
 deleteSectionBtn.addEventListener('click', () => {
     if (!activeSectionId) return;
     const sectionName = userData.notebooks[activeNotebookId].sections[activeSectionId].name;
-    showModal('Excluir Secção', `Tem a certeza que deseja excluir a secção "${sectionName}" e todas as suas páginas?`, false, async (confirm) => {
-        if (confirm) {
-            delete userData.notebooks[activeNotebookId].sections[activeSectionId];
-            userData.notebooks[activeNotebookId].lastModified = Date.now();
-            const remainingSectionIds = Object.keys(userData.notebooks[activeNotebookId].sections);
-            activeSectionId = remainingSectionIds.length > 0 ? remainingSectionIds[0] : null;
-            activePageId = null;
-            await saveChanges();
-            render();
+    showModal('Excluir Secção', `Tem a certeza que deseja excluir a secção "${sectionName}" e todas as suas páginas?`, {
+        confirmCallback: async (confirm) => {
+            if (confirm) {
+                delete userData.notebooks[activeNotebookId].sections[activeSectionId];
+                userData.notebooks[activeNotebookId].lastModified = Date.now();
+                const remainingSectionIds = Object.keys(userData.notebooks[activeNotebookId].sections);
+                activeSectionId = remainingSectionIds.length > 0 ? remainingSectionIds[0] : null;
+                activePageId = null;
+                await saveChanges();
+                render();
+            }
         }
     });
 });
@@ -421,27 +590,33 @@ deleteSectionBtn.addEventListener('click', () => {
 renamePageBtn.addEventListener('click', () => {
     if (!activePageId) return;
     const currentPageName = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name;
-    showModal('Renomear Página', 'Novo nome para a página:', true, async (newName) => {
-        if (newName && newName.trim() !== "" && newName.trim() !== currentPageName) {
-            userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name = newName.trim();
-            userData.notebooks[activeNotebookId].lastModified = Date.now();
-            await saveChanges();
-            render();
+    showModal('Renomear Página', 'Novo nome para a página:', {
+        showInput: true,
+        inputValue: currentPageName,
+        confirmCallback: async (newName) => {
+            if (newName && newName.trim() !== "" && newName.trim() !== currentPageName) {
+                userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name = newName.trim();
+                userData.notebooks[activeNotebookId].lastModified = Date.now();
+                await saveChanges();
+                render();
+            }
         }
-    }, currentPageName);
+    });
 });
 
 deletePageBtn.addEventListener('click', () => {
     if (!activePageId) return;
     const pageName = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name;
-    showModal('Excluir Página', `Tem a certeza que deseja excluir a página "${pageName}"?`, false, async (confirm) => {
-        if (confirm) {
-            delete userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId];
-            userData.notebooks[activeNotebookId].lastModified = Date.now();
-            const remainingPageIds = Object.keys(userData.notebooks[activeNotebookId].sections[activeSectionId].pages);
-            activePageId = remainingPageIds.length > 0 ? remainingPageIds[0] : null;
-            await saveChanges();
-            render();
+    showModal('Excluir Página', `Tem a certeza que deseja excluir a página "${pageName}"?`, {
+        confirmCallback: async (confirm) => {
+            if (confirm) {
+                delete userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId];
+                userData.notebooks[activeNotebookId].lastModified = Date.now();
+                const remainingPageIds = Object.keys(userData.notebooks[activeNotebookId].sections[activeSectionId].pages);
+                activePageId = remainingPageIds.length > 0 ? remainingPageIds[0] : null;
+                await saveChanges();
+                render();
+            }
         }
     });
 });
@@ -522,45 +697,55 @@ if (fontSizeSelect) {
 
 // --- Lógica para o Resumo com Gemini ---
 
-// 1. Ouve o evento de clique com o botão direito DENTRO da área de texto
 pageContent.addEventListener('contextmenu', (event) => {
-    event.preventDefault(); // Impede o menu padrão do navegador de aparecer
+    event.preventDefault();
     const selectedText = window.getSelection().toString().trim();
-
-    // 2. Se o usuário selecionou algum texto, mostra nosso menu personalizado
-    if (selectedText.length > 20) { // Mostra só se o texto for relevante
+    if (selectedText.length > 20) {
         customContextMenu.style.top = `${event.pageY}px`;
         customContextMenu.style.left = `${event.pageX}px`;
-        customContextMenu.classList.remove('hidden'); // Torna o menu visível
+        customContextMenu.classList.remove('hidden');
     }
 });
 
-// 3. Ouve o clique no nosso botão "Resumir Texto"
 summarizeBtn.addEventListener('click', () => {
     const selectedText = window.getSelection().toString().trim();
-
     if (selectedText) {
-        // Mostra um pop-up de "carregando"
-        showModal('Gerando Resumo', 'Aguarde, estamos processando...', false, () => {});
-
-        // 4. CHAMA A SUA CLOUD FUNCTION, enviando o texto selecionado
+        showModal('Gerando Resumo', 'Aguarde, estamos processando o seu texto...', { showButtons: false, showSpinner: true });
         summarizeText({ text: selectedText })
-            .then((result) => {
-                // 5. QUANDO A FUNÇÃO RETORNA O RESUMO, ele é exibido no pop-up
+            .then(async (result) => {
                 const summary = result.data.summary;
-                showModal('Resumo Gerado pela IA', summary, false, () => {});
+                if (activePageId) {
+                    const page = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId];
+                    if (!page.summaries) {
+                        page.summaries = [];
+                    }
+                    page.summaries.push({
+                        createdAt: Date.now(),
+                        originalText: selectedText,
+                        summaryText: summary
+                    });
+                    await saveChanges();
+                    renderPageContent(); // Atualiza a UI para mostrar o contador de resumos
+                }
+                hideModal();
+                showModal('Resumo Gerado pela IA', summary, { 
+                    showCancelButton: false, 
+                    confirmText: 'Fechar',
+                    confirmCallback: hideModal 
+                });
             })
             .catch((error) => {
-                // Se der erro, mostra uma mensagem de erro
-                showModal('Erro', 'Não foi possível gerar o resumo.', false, () => {});
+                hideModal();
+                showModal('Erro', 'Não foi possível gerar o resumo. Tente novamente.', { 
+                    showCancelButton: false, 
+                    confirmText: 'Fechar',
+                    confirmCallback: hideModal 
+                });
             });
     }
-    customContextMenu.classList.add('hidden'); // Esconde o menu após o clique
-});
-
-// Bônus: Esconde o menu se o usuário clicar em qualquer outro lugar da página
-document.addEventListener('click', () => {
     customContextMenu.classList.add('hidden');
 });
 
-// Última atualização para forçar o deploy.
+document.addEventListener('click', () => {
+    customContextMenu.classList.add('hidden');
+});

@@ -35,3 +35,39 @@ exports.summarizeText = onCall({secrets: ["GEMINI_KEY"]}, (request) => {
     throw new Error("Não foi possível gerar o resumo.");
   }
 });
+
+// NOVA FUNÇÃO PARA GERAR MAPAS MENTAIS
+exports.generateMindMap = onCall({secrets: ["GEMINI_KEY"]}, (request) => {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
+
+    if (!request.auth) {
+        throw new Error("Você precisa estar autenticado para usar esta função.");
+    }
+
+    const text = request.data.text;
+    if (!text || typeof text !== "string" || text.trim().length === 0) {
+        throw new Error("O texto fornecido é inválido.");
+    }
+
+    try {
+        const model = genAI.getGenerativeModel({model: "gemini-2.5-flash"});
+        const prompt = `
+            Analise o seguinte texto e gere uma estrutura de mapa mental em formato de lista hierárquica (markdown).
+            - O primeiro item deve ser o tópico central.
+            - Itens com um recuo (um traço) devem ser os ramos principais.
+            - Itens com mais recuo (dois traços) devem ser os sub-ramos.
+            - Seja conciso e foque nos conceitos e palavras-chave.
+
+            Texto: "${text}"
+        `;
+
+        return model.generateContent(prompt).then((result) => {
+            const response = result.response;
+            const mindMapData = response.text();
+            return { mindMapData: mindMapData };
+        });
+    } catch (error) {
+        console.error("Erro na API do Gemini ao gerar mapa mental:", error);
+        throw new Error("Não foi possível gerar o mapa mental.");
+    }
+});

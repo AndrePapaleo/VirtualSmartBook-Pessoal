@@ -25,7 +25,6 @@ body {
     min-height: 0;
 }
 
-/* NOVO: Estilo para o item selecionado nas listas */
 .active-item {
     background-color: #3b82f6; /* azul-500 */
     color: white;
@@ -44,7 +43,6 @@ body {
     white-space: pre-wrap;
     padding: 1rem;
     min-height: 180px;
-    /* Adicionado para remover bordas e o contorno de foco */
     outline: none;
     border: none;
     box-shadow: none;
@@ -58,7 +56,7 @@ body {
     border-radius: 0.375rem; /* rounded-md */
     transition: background-color 0.2s;
 }
-.toolbar-icon-btn:hover {
+.toolbar-icon-btn:hover:not(:disabled) {
     background-color: #f1f5f9; /* gray-100 */
 }
 .toolbar-icon-btn:disabled {
@@ -85,3 +83,15 @@ body {
     background: #94a3b8;
 }
 
+/* NOVOS ESTILOS PARA MODAL DE RESUMOS */
+#summaries-list-container {
+    overflow-y: auto;
+}
+
+/* Remove o marcador padrão do <summary> */
+summary {
+    list-style: none;
+}
+summary::-webkit-details-marker {
+    display: none;
+}
