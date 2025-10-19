@@ -9,10 +9,10 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-s
 
 // A configuração do seu web app do Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyDUK99BLgEuV4hpqxbnnM1z-nj0cnS5M6o",
+    apiKey: "AIzaSyBnRZX6vm3V3IidlaewRKbUkzNKhDuMYxM",
     authDomain: "vsb-first.firebaseapp.com",
     projectId: "vsb-first",
-    storageBucket: "vsb-first.appspot.com", // Verifique se este é o bucket correto no seu projeto Firebase
+    storageBucket: "vsb-first.firebasestorage.app", // Verifique se este é o bucket correto no seu projeto Firebase
     messagingSenderId: "153261737604",
     appId: "1:153261737604:web:5fa49e2c7c53ed99d5a4d1",
     measurementId: "G-DJBSLEKDDC"
