@@ -1,14 +1,12 @@
 // src/js/firebase-init.js
 
-// Import the functions you need from the SDKs you need
+// Importa as funções que você precisa dos SDKs que você precisa
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+// Linha corrigida: importa getAuth e GoogleAuthProvider juntos
+import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
+// A configuração do seu web app do Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDUK99BLgEuV4hpqxbnnM1z-nj0cnS5M6o",
     authDomain: "vsb-first.firebaseapp.com",
@@ -19,9 +17,11 @@ const firebaseConfig = {
     measurementId: "G-DJBSLEKDDC"
 };
 
-// Initialize Firebase
+// Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 
-// Export a instância dos serviços que você vai usar
+// Exporta as instâncias dos serviços que você vai usar
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+// Nova exportação necessária para o login com Google
+export const googleProvider = new GoogleAuthProvider();

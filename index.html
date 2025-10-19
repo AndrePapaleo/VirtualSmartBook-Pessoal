@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Início - Virtual Smart Book</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/css/style.css">
+    </head>
+<body class="text-gray-800">
+    <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold text-blue-700">
+                VSB <span class="font-normal text-gray-700 text-xl">| Virtual Smart Book</span>
+            </a>
+        <nav class="hidden md:flex space-x-6 items-center">
+            <a href="#inicio" class="text-gray-600 hover:text-blue-600 transition duration-300">Início</a>
+            <a href="#recursos" class="text-gray-600 hover:text-blue-600 transition duration-300">Recursos</a>
+            <a href="src/pages/sobre.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Sobre</a>
+            <a href="#contato" class="text-gray-600 hover:text-blue-600 transition duration-300">Contato</a>
+            <a href="#ajuda" class="text-gray-600 hover:text-blue-600 transition duration-300">Ajuda</a>
+        </nav>
+        <div class="flex items-center space-x-3">
+            <a href="src/pages/login.html" class="text-blue-600 hover:text-blue-700 font-medium px-4 py-2 rounded-md transition duration-300">Login</a>
+            <a href="src/pages/cadastro.html" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md shadow-sm cta-button">Cadastre-se</a>
+        </div>
+        <div class="md:hidden">
+            <button id="mobile-menu-button" class="text-gray-600 hover:text-blue-600 focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+    </div>
+    <div id="mobile-menu" class="md:hidden hidden bg-white shadow-lg">
+        <a href="/vite-project/index.html" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-blue-600">Início</a>
+        <a href="#recursos" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-blue-600">Recursos</a>
+        <a href="src/pages/sobre.html" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-blue-600">Sobre</a>
+        <a href="#contato" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-blue-600">Contato</a>
+        <a href="#ajuda" class="block px-6 py-3 text-gray-600 hover:bg-gray-100 hover:text-blue-600">Ajuda</a>
+    </div>
+</header>
+
+<section id="inicio" class="hero-bg py-20 md:py-32">
+    <div class="container mx-auto px-6 text-center">
+        <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
+            <span class="text-blue-600">Virtual Smart Book:</span> Sua Plataforma Inteligente de Aprendizado.
+        </h1>
+        <p class="text-lg md:text-xl text-gray-700 mb-10 max-w-3xl mx-auto">
+            Organize, compartilhe e acesse materiais didáticos de forma simples e eficiente. Transforme a experiência de ensino e aprendizado.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <a href="src/pages/cadastro.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg cta-button">
+                Comece Agora Gratuitamente
+            </a>
+            <a href="#recursos" class="bg-transparent hover:bg-blue-100 text-blue-600 font-semibold py-3 px-8 rounded-lg text-lg border-2 border-blue-600 cta-button">
+                Conheça os Recursos
+            </a>
+        </div>
+        <div class="mt-16">
+            <img src="assets/img1.png " width="35%" height="450"
+                 alt="Ilustração da plataforma VSB em uso" 
+                 class="mx-auto rounded-lg shadow-2xl"
+                 onerror="this.onerror=null;this.src='https://placehold.co/800x450/E0E7FF/3B82F6?text=Erro+ao+carregar+imagem';">
+        </div>
+    </div>
+</section>
+
+<section id="problema" class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Desafios no Ensino Atual? O VSB Ajuda!</h2>
+            <p class="text-lg text-gray-700 max-w-2xl mx-auto">Sabemos como pode ser complexo gerenciar e distribuir materiais. O VSB simplifica tudo.</p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+                <img src="assets/img2.png" width="60%" height="400"
+                     alt="Ilustração de desafios educacionais" 
+                     class="rounded-lg shadow-xl"
+                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/E0E7FF/4A5568?text=Erro+ao+carregar+imagem';">
+            </div>
+            <div class="space-y-6">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="bg-blue-100 text-blue-600 p-3 rounded-full">
+                            <i class="fas fa-folder-open fa-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-1">Materiais Desorganizados?</h3>
+                        <p class="text-gray-700">Centralize todos os seus slides, listas de exercícios, provas e mais em um único lugar seguro e organizado.</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="bg-blue-100 text-blue-600 p-3 rounded-full">
+                            <i class="fas fa-users fa-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-1">Dificuldade de Acesso para Alunos?</h3>
+                        <p class="text-gray-700">Ofereça aos seus alunos acesso fácil e rápido aos materiais de qualquer dispositivo, a qualquer hora.</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="bg-blue-100 text-blue-600 p-3 rounded-full">
+                            <i class="fas fa-comments fa-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-1">Falta de Interação?</h3>
+                        <p class="text-gray-700">Promova um ambiente de aprendizado mais dinâmico com recursos que facilitam a comunicação e o feedback.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="recursos" class="py-16 md:py-24 bg-gray-50">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Recursos Poderosos para Professores e Alunos</h2>
+            <p class="text-lg text-gray-700 max-w-2xl mx-auto">Descubra como o VSB pode facilitar o seu dia a dia acadêmico.</p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-xl shadow-lg feature-card">
+                <div class="flex items-center justify-center bg-blue-500 text-white w-16 h-16 rounded-full mb-6 shadow-md">
+                    <i class="fas fa-archive fa-2x"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Organização Centralizada</h3>
+                <p class="text-gray-700 leading-relaxed">Guarde e organize todos os seus materiais didáticos em um só lugar. Chega de arquivos perdidos!</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg feature-card">
+                <div class="flex items-center justify-center bg-green-500 text-white w-16 h-16 rounded-full mb-6 shadow-md">
+                    <i class="fas fa-share-alt fa-2x"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Compartilhamento Fácil</h3>
+                <p class="text-gray-700 leading-relaxed">Disponibilize conteúdos para turmas específicas ou alunos individualmente com apenas alguns cliques.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg feature-card">
+                <div class="flex items-center justify-center bg-purple-500 text-white w-16 h-16 rounded-full mb-6 shadow-md">
+                    <i class="fas fa-mobile-alt fa-2x"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Acesso Multidispositivo</h3>
+                <p class="text-gray-700 leading-relaxed">Alunos podem acessar os materiais de estudo em computadores, tablets ou smartphones.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg feature-card">
+                <div class="flex items-center justify-center bg-yellow-500 text-white w-16 h-16 rounded-full mb-6 shadow-md">
+                    <i class="fas fa-user-shield fa-2x"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Perfis Personalizados</h3>
+                <p class="text-gray-700 leading-relaxed">Ambientes distintos e otimizados para as necessidades de professores e alunos.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg feature-card">
+                <div class="flex items-center justify-center bg-red-500 text-white w-16 h-16 rounded-full mb-6 shadow-md">
+                    <i class="fas fa-tasks fa-2x"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Gestão de Atividades</h3>
+                <p class="text-gray-700 leading-relaxed">Crie, distribua e acompanhe listas de exercícios, trabalhos e provas de forma integrada.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg feature-card">
+                <div class="flex items-center justify-center bg-indigo-500 text-white w-16 h-16 rounded-full mb-6 shadow-md">
+                    <i class="fas fa-headset fa-2x"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Suporte Dedicado</h3>
+                <p class="text-gray-700 leading-relaxed">Conte com nossa equipe de ajuda para tirar dúvidas e resolver qualquer questão rapidamente.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="como-funciona" class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Comece a Usar em 3 Passos Simples</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-10 text-center">
+            <div class="p-6">
+                <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">1</div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Crie sua Conta</h3>
+                <p class="text-gray-700">Cadastre-se gratuitamente como professor ou aluno em menos de um minuto.</p>
+            </div>
+            <div class="p-6">
+                <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">2</div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Organize seu Conteúdo</h3>
+                <p class="text-gray-700">Faça upload de seus materiais, crie pastas e organize tudo da sua maneira (para professores).</p>
+            </div>
+            <div class="p-6">
+                <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">3</div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Compartilhe e Aprenda</h3>
+                <p class="text-gray-700">Disponibilize para suas turmas ou acesse os materiais liberados pelo seu professor.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="depoimentos" class="py-16 md:py-24 bg-gray-50">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">O que Dizem Nossos Usuários</h2>
+            <p class="text-lg text-gray-700 max-w-2xl mx-auto">A satisfação de quem usa o VSB é nossa maior recompensa.</p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex items-center mb-4">
+                    <img src="https://placehold.co/60x60/E0E7FF/3B82F6?text=P" alt="Foto do Professor Silva" class="w-14 h-14 rounded-full mr-4" onerror="this.onerror=null;this.src='https://placehold.co/60x60/E0E7FF/3B82F6?text=Erro';">
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Prof. Silva</h4>
+                        <p class="text-sm text-gray-600">IFSP Campus Pirituba</p>
+                    </div>
+                </div>
+                <p class="text-gray-700 italic">"O VSB transformou a maneira como organizo e compartilho meus materiais. Meus alunos adoraram a facilidade de acesso!"</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex items-center mb-4">
+                    <img src="https://placehold.co/60x60/E0E7FF/3B82F6?text=A" alt="Foto da Aluna Beatriz" class="w-14 h-14 rounded-full mr-4" onerror="this.onerror=null;this.src='https://placehold.co/60x60/E0E7FF/3B82F6?text=Erro';">
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Aluna Beatriz M.</h4>
+                        <p class="text-sm text-gray-600">Engenharia de Software</p>
+                    </div>
+                </div>
+                <p class="text-gray-700 italic">"Finalmente uma plataforma onde encontro tudo organizado! Consigo estudar pelo celular em qualquer lugar."</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="flex items-center mb-4">
+                    <img src="https://placehold.co/60x60/E0E7FF/3B82F6?text=C" alt="Foto do Coordenador Alves" class="w-14 h-14 rounded-full mr-4" onerror="this.onerror=null;this.src='https://placehold.co/60x60/E0E7FF/3B82F6?text=Erro';">
+                    <div>
+                        <h4 class="font-semibold text-gray-900">Coord. Alves</h4>
+                        <p class="text-sm text-gray-600">Departamento de Tecnologia</p>
+                    </div>
+                </div>
+                <p class="text-gray-700 italic">"Implementamos o VSB em nossa instituição e o feedback dos professores e alunos tem sido extremamente positivo."</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contato" class="py-20 md:py-32 hero-bg">
+    <div class="container mx-auto px-6 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Pronto para Revolucionar sua Experiência de Ensino e Aprendizado?</h2>
+        <p class="text-lg text-gray-700 mb-10 max-w-2xl mx-auto">
+            Junte-se aos educadores e estudantes que já estão aproveitando os benefícios do Virtual Smart Book.
+        </p>
+        <a href="src/pages/cadastro.html" class="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-10 rounded-lg text-xl shadow-xl cta-button">
+            Crie sua Conta Grátis Agora!
+        </a>
+    </div>
+</section>
+
+<footer id="ajuda" class="bg-gray-800 text-gray-300 py-16">
+    <div class="container mx-auto px-6">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+            <div>
+                <h5 class="text-xl font-semibold text-white mb-4">VSB - Virtual Smart Book</h5>
+                <p class="text-gray-400">Sua plataforma inteligente de aprendizado, simplificando a educação.</p>
+            </div>
+            <div>
+                <h5 class="text-lg font-semibold text-white mb-4">Navegação</h5>
+                <ul class="space-y-2">
+                    <li><a href="index.html" class="hover:text-blue-400 transition duration-300">Início</a></li>
+                    <li><a href="#recursos" class="hover:text-blue-400 transition duration-300">Recursos</a></li>
+                    <li><a href="src/pages/sobre.html" class="hover:text-blue-400 transition duration-300">Sobre Nós</a></li>
+                    <li><a href="#contato" class="hover:text-blue-400 transition duration-300">Fale Conosco</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-lg font-semibold text-white mb-4">Legal</h5>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-blue-400 transition duration-300">Termos de Serviço</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition duration-300">Política de Privacidade</a></li>
+                    <li><a href="#" class="hover:text-blue-400 transition duration-300">FAQ</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-lg font-semibold text-white mb-4">Siga-nos</h5>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-blue-400 transition duration-300"><i class="fab fa-facebook-f fa-lg"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-blue-400 transition duration-300"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-blue-400 transition duration-300"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-blue-400 transition duration-300"><i class="fab fa-youtube fa-lg"></i></a>
+                </div>
+                 <div class="mt-4">
+                    <h5 class="text-lg font-semibold text-white mb-2">Precisa de Ajuda?</h5>
+                     <a href="mailto:suporte@vsb.com.br" class="text-blue-400 hover:text-blue-300">suporte@vsb.com.br</a>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-8 text-center">
+            <p class="text-gray-500">&copy; <span id="currentYear"></span> Virtual Smart Book. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</footer>
+    <script src="src/js/main.js"></script>
+    </body>
+</html>
