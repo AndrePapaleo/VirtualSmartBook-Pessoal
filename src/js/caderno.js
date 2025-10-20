@@ -297,7 +297,7 @@ function renderNotebookName(name) { activeNotebookNameEl.textContent = name; }
 function renderSectionsList(sections) {
     sectionsList.innerHTML = '';
     if (Object.keys(sections).length === 0) {
-        sectionsList.innerHTML = `<p class="text-gray-500 p-2 text-sm">Nenhuma secção.</p>`;
+        sectionsList.innerHTML = `<p class="text-gray-500 p-2 text-sm">Nenhuma sessão.</p>`;
         return;
     }
     for (const sectionId in sections) {
@@ -369,9 +369,19 @@ function toggleManagementButtons() {
 }
 
 function showModal(title, message, options = {}) {
+    // Esconde todos os campos customizados antes de mostrar o modal
+    const customLabels = document.querySelectorAll('.modal-label');
+    const customInputs = document.querySelectorAll('.modal-input-field');
+    customLabels.forEach(label => label.classList.add('hidden'));
+    customInputs.forEach(input => input.classList.add('hidden'));
+
     const {
         showInput = false,
+        showTextInput = false,
         inputValue = '',
+        textInputValue = '',
+        textInputPlaceholder = 'Texto a ser exibido',
+        urlInputPlaceholder = 'https://...',
         showSpinner = false,
         showButtons = true,
         showCancelButton = true,
@@ -381,9 +391,27 @@ function showModal(title, message, options = {}) {
 
     modalTitle.textContent = title;
     modalMessage.textContent = message;
-    modalInput.value = inputValue;
 
-    modalInput.classList.toggle('hidden', !showInput);
+    const modalInputText = document.getElementById('modal-input-text');
+    const modalLabelText = document.getElementById('modal-label-text');
+    const modalInputURL = document.getElementById('modal-input');
+    const modalLabelURL = document.getElementById('modal-label-url');
+
+    if (showTextInput) {
+        modalLabelText.classList.remove('hidden');
+        modalInputText.classList.remove('hidden');
+        modalInputText.value = textInputValue;
+        modalInputText.placeholder = textInputPlaceholder;
+    }
+    
+    if (showInput) {
+        modalLabelURL.textContent = showTextInput ? "URL do Link:" : "Novo nome:";
+        modalLabelURL.classList.remove('hidden');
+        modalInputURL.classList.remove('hidden');
+        modalInputURL.value = inputValue;
+        modalInputURL.placeholder = urlInputPlaceholder;
+    }
+    
     modalSpinner.classList.toggle('hidden', !showSpinner);
     modalButtons.classList.toggle('hidden', !showButtons);
     modalCancelBtn.classList.toggle('hidden', !showCancelButton);
@@ -391,11 +419,14 @@ function showModal(title, message, options = {}) {
     modalConfirmBtn.textContent = confirmText;
     
     confirmationModal.classList.remove('hidden');
-    modalConfirmCallback = confirmCallback;
+    modalConfirmCallback = (result) => {
+        if (options.confirmCallback) {
+            options.confirmCallback(result);
+        }
+    };
 
-    if (showInput) modalInput.focus();
+    if (showInput) modalInputURL.focus();
 }
-
 
 function hideModal() {
     confirmationModal.classList.add('hidden');
@@ -466,7 +497,7 @@ function markdownListToHtml(markdown) {
 
 
 // =================================================================================
-// EVENT LISTENERS
+// EVENT LISTENERS ORIGINAIS (PERMANECEM AQUI)
 // =================================================================================
 
 if (exportMdBtn) exportMdBtn.addEventListener('click', exportToMarkdown);
@@ -524,10 +555,8 @@ if (mindMapModalCloseBtn) {
     });
 }
 
-
-// --- Listeners de Gestão ---
 addSectionBtn.addEventListener('click', () => {
-    showModal('Criar Nova Secção', 'Qual será o nome da nova secção?', {
+    showModal('Criar Nova Sessão', 'Qual será o nome da nova sessão?', {
         showInput: true,
         confirmCallback: async (name) => {
             if (name && name.trim() !== "") {
@@ -547,7 +576,7 @@ addSectionBtn.addEventListener('click', () => {
 
 addPageBtn.addEventListener('click', () => {
     if (!activeSectionId) {
-        showModal('Atenção', 'Por favor, selecione uma secção antes de adicionar uma página.', { showCancelButton: false, confirmText: 'OK' });
+        showModal('Atenção', 'Por favor, selecione uma sessão antes de adicionar uma página.', { showCancelButton: false, confirmText: 'OK' });
         return;
     }
     showModal('Criar Nova Página', 'Qual será o nome da nova página?', {
@@ -569,7 +598,7 @@ addPageBtn.addEventListener('click', () => {
 
 renameNotebookBtn.addEventListener('click', () => {
     const currentName = userData.notebooks[activeNotebookId].name;
-    showModal('Renomear Caderno', 'Novo nome para o caderno:', {
+    showModal('Renomear Caderno', '', {
         showInput: true,
         inputValue: currentName,
         confirmCallback: async (newName) => {
@@ -599,7 +628,7 @@ deleteNotebookBtn.addEventListener('click', () => {
 renameSectionBtn.addEventListener('click', () => {
     if (!activeSectionId) return;
     const currentName = userData.notebooks[activeNotebookId].sections[activeSectionId].name;
-    showModal('Renomear Secção', 'Novo nome para a secção:', {
+    showModal('Renomear Sessão', '', {
         showInput: true,
         inputValue: currentName,
         confirmCallback: async (newName) => {
@@ -616,7 +645,7 @@ renameSectionBtn.addEventListener('click', () => {
 deleteSectionBtn.addEventListener('click', () => {
     if (!activeSectionId) return;
     const sectionName = userData.notebooks[activeNotebookId].sections[activeSectionId].name;
-    showModal('Excluir Secção', `Tem a certeza que deseja excluir a secção "${sectionName}" e todas as suas páginas?`, {
+    showModal('Excluir Sessão', `Tem a certeza que deseja excluir a sessão "${sectionName}" e todas as suas páginas?`, {
         confirmCallback: async (confirm) => {
             if (confirm) {
                 delete userData.notebooks[activeNotebookId].sections[activeSectionId];
@@ -634,7 +663,7 @@ deleteSectionBtn.addEventListener('click', () => {
 renamePageBtn.addEventListener('click', () => {
     if (!activePageId) return;
     const currentPageName = userData.notebooks[activeNotebookId].sections[activeSectionId].pages[activePageId].name;
-    showModal('Renomear Página', 'Novo nome para a página:', {
+    showModal('Renomear Página', '', {
         showInput: true,
         inputValue: currentPageName,
         confirmCallback: async (newName) => {
@@ -692,15 +721,23 @@ pageContent.addEventListener('input', () => {
 
 modalConfirmBtn.addEventListener('click', () => {
     if (modalConfirmCallback) {
-        const inputValue = modalInput.classList.contains('hidden') ? true : modalInput.value;
-        modalConfirmCallback(inputValue);
+        // Para o modal de link, passamos um objeto com os dois valores
+        if (document.getElementById('modal-input-text') && !document.getElementById('modal-input-text').classList.contains('hidden')) {
+            const result = {
+                text: document.getElementById('modal-input-text').value,
+                url: document.getElementById('modal-input').value
+            };
+            modalConfirmCallback(result);
+        } else { // Comportamento antigo para outros modais
+            const inputValue = modalInput.classList.contains('hidden') ? true : modalInput.value;
+            modalConfirmCallback(inputValue);
+        }
     }
     hideModal();
 });
 
 modalCancelBtn.addEventListener('click', hideModal);
 
-// --- Listeners de Formatação de Texto ---
 document.execCommand('defaultParagraphSeparator', false, 'p');
 
 if (boldBtn) boldBtn.addEventListener('click', () => document.execCommand('bold'));
@@ -740,7 +777,6 @@ if (fontSizeSelect) {
 }
 
 // --- Lógica para o Resumo com Gemini ---
-
 pageContent.addEventListener('contextmenu', (event) => {
     event.preventDefault();
     const selectedText = window.getSelection().toString().trim();
@@ -790,6 +826,328 @@ summarizeBtn.addEventListener('click', () => {
     customContextMenu.classList.add('hidden');
 });
 
-document.addEventListener('click', () => {
-    customContextMenu.classList.add('hidden');
+document.addEventListener('click', (e) => {
+    if (customContextMenu && !customContextMenu.contains(e.target)) {
+        customContextMenu.classList.add('hidden');
+    }
 });
+
+
+// =================================================================================
+// INÍCIO: NOVAS FUNCIONALIDADES DO EDITOR DE TEXTO (VERSÃO ROBUSTA)
+// =================================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- 1. CAPTURA DE ELEMENTOS DO EDITOR ---
+    const allToolbarButtons = {
+        undoBtn: document.getElementById('undo-btn'),
+        redoBtn: document.getElementById('redo-btn'),
+        formatPainterBtn: document.getElementById('format-painter-btn'),
+        boldBtn: document.getElementById('bold-btn'),
+        italicBtn: document.getElementById('italic-btn'),
+        underlineBtn: document.getElementById('underline-btn'),
+        strikethroughBtn: document.getElementById('strikethrough-btn'),
+        textColorBtn: document.getElementById('text-color-btn'),
+        highlightColorBtn: document.getElementById('highlight-color-btn'),
+        linkBtn: document.getElementById('link-btn'),
+        alignLeftBtn: document.getElementById('align-left-btn'),
+        alignCenterBtn: document.getElementById('align-center-btn'),
+        alignRightBtn: document.getElementById('align-right-btn'),
+        alignJustifyBtn: document.getElementById('align-justify-btn'),
+        ulBtn: document.getElementById('ul-btn'),
+        olBtn: document.getElementById('ol-btn'),
+        outdentBtn: document.getElementById('outdent-btn'),
+        indentBtn: document.getElementById('indent-btn'),
+        blockquoteBtn: document.getElementById('blockquote-btn'),
+        removeFormatBtn: document.getElementById('remove-format-btn'),
+        textColorPalette: document.getElementById('text-color-palette'),
+        highlightColorPalette: document.getElementById('highlight-color-palette'),
+        textColorPreview: document.getElementById('text-color-preview'),
+        highlightColorPreview: document.getElementById('highlight-color-preview')
+    };
+
+    // --- 2. LÓGICA DAS PALETAS DE CORES ---
+    const textColors = ['#000000', '#434343', '#666666', '#999999', '#B7B7B7', '#FFFFFF', '#3B82F6', '#E06666', '#F6B26B', '#FFD966', '#93C47D', '#8E7CC3'];
+    const highlightColors = ['#FFF2CC', '#D9EAD3', '#CFE2F3', '#F4CCCC', '#EAD1DC', 'transparent'];
+
+    function populateColorPalette(paletteElement, colors, command) {
+        if (!paletteElement) return;
+        paletteElement.innerHTML = '';
+        colors.forEach(color => {
+            const swatch = document.createElement('button');
+            swatch.className = 'color-swatch';
+            swatch.style.backgroundColor = color;
+            swatch.dataset.color = color;
+
+            if (color === 'transparent') {
+                swatch.style.backgroundImage = `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%239CA3AFFF' stroke-width='1' stroke-dasharray='3%2c 3' stroke-linecap='square'/%3e%3c/svg%3e")`;
+                swatch.title = "Sem Destaque";
+            }
+            
+            swatch.addEventListener('click', (e) => {
+                e.preventDefault();
+                const selectedColor = e.target.dataset.color;
+                document.execCommand(command, false, selectedColor);
+                
+                if (command === 'foreColor' && allToolbarButtons.textColorPreview) {
+                    allToolbarButtons.textColorPreview.style.backgroundColor = selectedColor;
+                } else if ((command === 'backColor' || command === 'hiliteColor') && allToolbarButtons.highlightColorPreview) {
+                    allToolbarButtons.highlightColorPreview.style.backgroundColor = selectedColor;
+                }
+                
+                paletteElement.classList.add('hidden');
+                pageContent.focus();
+            });
+            paletteElement.appendChild(swatch);
+        });
+    }
+
+    populateColorPalette(allToolbarButtons.textColorPalette, textColors, 'foreColor');
+    populateColorPalette(allToolbarButtons.highlightColorPalette, highlightColors, 'backColor');
+
+    if (allToolbarButtons.textColorBtn) {
+        allToolbarButtons.textColorBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            allToolbarButtons.highlightColorPalette.classList.add('hidden');
+            allToolbarButtons.textColorPalette.classList.toggle('hidden');
+        });
+    }
+
+    if (allToolbarButtons.highlightColorBtn) {
+        allToolbarButtons.highlightColorBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            allToolbarButtons.textColorPalette.classList.add('hidden');
+            allToolbarButtons.highlightColorPalette.classList.toggle('hidden');
+        });
+    }
+    
+    // --- 3. LÓGICA DO PINCEL DE FORMATAÇÃO (ROBUSTA) ---
+    let formatPainterActive = false;
+    let copiedNode = null;
+
+    if (allToolbarButtons.formatPainterBtn) {
+        allToolbarButtons.formatPainterBtn.addEventListener('click', () => {
+            if (formatPainterActive) {
+                formatPainterActive = false;
+                allToolbarButtons.formatPainterBtn.classList.remove('btn-active');
+                pageContent.style.cursor = 'text';
+                copiedNode = null;
+                return;
+            }
+            
+            const selection = window.getSelection();
+            if (!selection.rangeCount || selection.isCollapsed) return;
+
+            let parent = selection.getRangeAt(0).commonAncestorContainer;
+            if (parent.nodeType !== Node.ELEMENT_NODE) {
+                parent = parent.parentNode;
+            }
+
+            if (parent && parent.id !== 'page-content') {
+                copiedNode = parent.cloneNode(false);
+                formatPainterActive = true;
+                allToolbarButtons.formatPainterBtn.classList.add('btn-active');
+                pageContent.style.cursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18.5,1.15a3.36,3.36,0,0,0-2.38.97L4.6,13.62a1.25,1.25,0,0,0-.35.84V17.5a1.25,1.25,0,0,0,1.25,1.25H8.54a1.25,1.25,0,0,0,.84-.35L20.88,6.88a3.36,3.36,0,0,0,0-4.76,3.36,3.36,0,0,0-2.38-.97ZM8.12,17H6.5V15.38L15.62,6.25l1.63,1.63Zm11-11L17.5,7.62,15.88,6,17.5,4.38a1.86,1.86,0,0,1,2.63,0,1.86,1.86,0,0,1,0,2.63Z"/></svg>'), auto`;
+            }
+        });
+    }
+
+    if (pageContent) {
+        pageContent.addEventListener('mouseup', () => {
+            if (formatPainterActive && copiedNode && window.getSelection().toString().length > 0) {
+                const selection = window.getSelection();
+                if (selection.rangeCount) {
+                    const range = selection.getRangeAt(0);
+                    const nodeToApply = copiedNode.cloneNode(false);
+                    try {
+                        range.surroundContents(nodeToApply);
+                    } catch (e) {
+                        console.error("Não foi possível aplicar a formatação:", e);
+                    }
+                }
+                
+                formatPainterActive = false;
+                copiedNode = null;
+                if (allToolbarButtons.formatPainterBtn) allToolbarButtons.formatPainterBtn.classList.remove('btn-active');
+                pageContent.style.cursor = 'text';
+                selection.removeAllRanges();
+            }
+        });
+    }
+
+    // --- 4. NOVOS LISTENERS DE FORMATAÇÃO ---
+    if(allToolbarButtons.undoBtn) allToolbarButtons.undoBtn.addEventListener('click', () => document.execCommand('undo'));
+    if(allToolbarButtons.redoBtn) allToolbarButtons.redoBtn.addEventListener('click', () => document.execCommand('redo'));
+    if(allToolbarButtons.indentBtn) allToolbarButtons.indentBtn.addEventListener('click', () => document.execCommand('indent'));
+    if(allToolbarButtons.outdentBtn) allToolbarButtons.outdentBtn.addEventListener('click', () => document.execCommand('outdent'));
+
+    if (allToolbarButtons.blockquoteBtn) {
+        allToolbarButtons.blockquoteBtn.addEventListener('click', () => {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+            let parent = selection.getRangeAt(0).commonAncestorContainer;
+            if (parent.nodeType !== Node.ELEMENT_NODE) {
+                parent = parent.parentNode;
+            }
+            const isBlockquote = parent.closest('blockquote');
+            document.execCommand('formatBlock', false, isBlockquote ? 'p' : 'blockquote');
+            pageContent.focus();
+        });
+    }
+
+    if (allToolbarButtons.linkBtn) {
+        allToolbarButtons.linkBtn.addEventListener('click', () => {
+            const selection = window.getSelection();
+            // Salva a seleção ANTES de mostrar o modal
+            const savedRange = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
+            const selectedText = selection.toString().trim();
+
+            showModal('Inserir Link', '', {
+                showInput: true,
+                showTextInput: true,
+                textInputValue: selectedText,
+                confirmCallback: (result) => {
+                    // Devolve o foco ao editor, essencial para qualquer abordagem
+                    pageContent.focus();
+
+                    // Adia a execução para garantir que o foco seja processado pelo navegador
+                    setTimeout(() => {
+                        const selection = window.getSelection();
+                        
+                        if (!savedRange) {
+                            console.error("ERRO: Nenhuma seleção foi salva. Impossível criar o link.");
+                            return;
+                        }
+
+                        // Restauramos a seleção salva para saber ONDE agir
+                        selection.removeAllRanges();
+                        selection.addRange(savedRange);
+
+                        const url = result.url.trim();
+                        let text = result.text.trim();
+                        
+                        if (!text) {
+                            text = url;
+                        }
+
+                        if (url && url !== 'https://' && !url.startsWith('javascript:')) {
+                            // ===============================================
+                            // INÍCIO DA MANIPULAÇÃO MANUAL DO DOM
+                            // ===============================================
+                            
+                            // 1. Deleta o conteúdo que estava selecionado (se houver)
+                            savedRange.deleteContents();
+
+                            // 2. Cria o novo elemento de link
+                            const linkElement = document.createElement('a');
+                            linkElement.href = url;
+                            linkElement.textContent = text;
+                            linkElement.target = '_blank';
+                            linkElement.rel = 'noopener noreferrer';
+
+                            // 3. Insere o elemento criado no lugar da seleção
+                            savedRange.insertNode(linkElement);
+                            
+                            // 4. (Opcional, mas bom para UX) Move o cursor para depois do link
+                            savedRange.setStartAfter(linkElement);
+                            savedRange.setEndAfter(linkElement);
+                            selection.removeAllRanges();
+                            selection.addRange(savedRange);
+
+                            // ===============================================
+                            // FIM DA MANIPULAÇÃO MANUAL DO DOM
+                            // ===============================================
+                        } else {
+                           // Se a URL for inválida, apenas insere o texto (como fallback)
+                           savedRange.deleteContents();
+                           savedRange.insertNode(document.createTextNode(text));
+                        }
+
+                    }, 0); 
+                }
+            });
+        });
+    }
+    
+    // ***** INÍCIO DAS ALTERAÇÕES: LÓGICA DO BOTÃO DE RECOLHER/EXPANDIR *****
+    const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+    const sidebarWrapper = document.getElementById('sidebar-wrapper');
+    const toggleIcon = document.getElementById('toggle-icon');
+
+    if (toggleSidebarBtn && sidebarWrapper && toggleIcon) {
+        toggleSidebarBtn.addEventListener('click', () => {
+            // Adiciona ou remove a classe 'collapsed' nos elementos
+            sidebarWrapper.classList.toggle('collapsed');
+            toggleSidebarBtn.classList.toggle('collapsed');
+
+            // Verifica se está recolhido para trocar o ícone da seta
+            if (sidebarWrapper.classList.contains('collapsed')) {
+                toggleIcon.classList.remove('fa-chevron-left');
+                toggleIcon.classList.add('fa-chevron-right');
+            } else {
+                toggleIcon.classList.remove('fa-chevron-right');
+                toggleIcon.classList.add('fa-chevron-left');
+            }
+        });
+    }
+    // ***** FIM DAS ALTERAÇÕES *****
+
+
+    // --- 5. LÓGICA OTIMIZADA PARA ATUALIZAR O ESTADO DOS BOTÕES ---
+    function updateToolbarState() {
+        const toggleButtonActive = (button, command) => {
+            if (button) {
+                button.classList.toggle('btn-active', document.queryCommandState(command));
+            }
+        };
+
+        const checkElementState = (button, tagName) => {
+            if (!button || window.getSelection().rangeCount === 0) return;
+            let container = window.getSelection().getRangeAt(0).commonAncestorContainer;
+            if (container.nodeType !== Node.ELEMENT_NODE) {
+                container = container.parentNode;
+            }
+            button.classList.toggle('btn-active', container && container.closest(tagName));
+        };
+
+        toggleButtonActive(allToolbarButtons.boldBtn, 'bold');
+        toggleButtonActive(allToolbarButtons.italicBtn, 'italic');
+        toggleButtonActive(allToolbarButtons.underlineBtn, 'underline');
+        toggleButtonActive(allToolbarButtons.strikethroughBtn, 'strikeThrough');
+        toggleButtonActive(allToolbarButtons.ulBtn, 'insertUnorderedList');
+        toggleButtonActive(allToolbarButtons.olBtn, 'insertOrderedList');
+        toggleButtonActive(allToolbarButtons.alignLeftBtn, 'justifyLeft');
+        toggleButtonActive(allToolbarButtons.alignCenterBtn, 'justifyCenter');
+        toggleButtonActive(allToolbarButtons.alignRightBtn, 'justifyRight');
+        toggleButtonActive(allToolbarButtons.alignJustifyBtn, 'justifyFull');
+        checkElementState(allToolbarButtons.linkBtn, 'a');
+        checkElementState(allToolbarButtons.blockquoteBtn, 'blockquote');
+    }
+
+    if (pageContent) {
+        let throttleTimeout;
+        const throttledUpdate = () => {
+            if (!throttleTimeout) {
+                throttleTimeout = setTimeout(() => {
+                    updateToolbarState();
+                    throttleTimeout = null;
+                }, 150);
+            }
+        };
+        ['keyup', 'mouseup', 'focus'].forEach(event => pageContent.addEventListener(event, throttledUpdate));
+        document.addEventListener('selectionchange', throttledUpdate);
+    }
+    
+    // --- 6. FECHAMENTO DAS PALETAS ---
+    document.addEventListener('click', (e) => {
+        if (allToolbarButtons.textColorPalette && allToolbarButtons.textColorBtn && !allToolbarButtons.textColorBtn.contains(e.target) && !allToolbarButtons.textColorPalette.contains(e.target)) {
+            allToolbarButtons.textColorPalette.classList.add('hidden');
+        }
+        if (allToolbarButtons.highlightColorPalette && allToolbarButtons.highlightColorBtn && !allToolbarButtons.highlightColorBtn.contains(e.target) && !allToolbarButtons.highlightColorPalette.contains(e.target)) {
+            allToolbarButtons.highlightColorPalette.classList.add('hidden');
+        }
+    });
+});
+// =================================================================================
+// FIM: NOVAS FUNCIONALIDADES DO EDITOR DE TEXTO
+// =================================================================================

@@ -5,20 +5,18 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f8fafc;
-    overflow: hidden; /* Impede a rolagem do corpo da página principal */
+    overflow: hidden;
 }
 
 /* ================================================================== */
-/* PAINÉIS LATERAIS (SECÇÕES E PÁGINAS)                               */
+/* PAINÉIS LATERAIS (SESSÕES E PÁGINAS)                               */
 /* ================================================================== */
 
-/* Define os painéis laterais como contentores flexíveis verticais */
 #sections-panel, .pages-sidebar {
     display: flex;
     flex-direction: column;
 }
 
-/* Faz com que a lista cresça e adicione uma barra de rolagem quando necessário */
 #sections-list, #pages-list {
     flex-grow: 1;
     overflow-y: auto;
@@ -26,11 +24,11 @@ body {
 }
 
 .active-item {
-    background-color: #3b82f6; /* azul-500 */
+    background-color: #3b82f6;
     color: white;
 }
 .active-item:hover {
-    background-color: #2563eb; /* azul-600 */
+    background-color: #2563eb;
 }
 
 
@@ -38,62 +36,151 @@ body {
 /* ÁREA DE CONTEÚDO PRINCIPAL (EDITOR)                                */
 /* ================================================================== */
 
+/* O contêiner PAI que agora segura a barra de rolagem */
+#editor-scroll-wrapper {
+    overflow-y: auto; /* Garante que a barra de rolagem apareça aqui, na extrema direita */
+}
+
+/* A "folha de papel" visual que fica DENTRO da área de rolagem */
+#page-render-area {
+  /* ***** ALTERAÇÃO AQUI ***** */
+  max-width: 1100px;  /* Aumentamos a largura da "folha" de 900px para 1100px */
+  margin: 0 auto;     /* Mantém a folha centralizada */
+  padding: 3rem 3rem; /* Diminuímos o padding lateral de 4rem para 3rem */
+}
+
+
 .content-editable-area {
     word-break: break-word;
     white-space: pre-wrap;
-    padding: 1rem;
     min-height: 180px;
     outline: none;
     border: none;
     box-shadow: none;
 }
 
+.content-editable-area blockquote {
+    margin-left: 20px;
+    padding-left: 15px;
+    border-left: 3px solid #d1d5db;
+}
+
+
 /* ================================================================== */
 /* UTILITÁRIOS E BOTÕES                                             */
 /* ================================================================== */
 .toolbar-icon-btn {
     padding: 0.5rem;
-    border-radius: 0.375rem; /* rounded-md */
+    border-radius: 0.375rem;
     transition: background-color 0.2s;
 }
 .toolbar-icon-btn:hover:not(:disabled) {
-    background-color: #f1f5f9; /* gray-100 */
+    background-color: #f1f5f9;
 }
 .toolbar-icon-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-/* Estilo para os novos seletores de cor */
-.color-picker-btn {
-    /* Remove a aparência padrão do navegador */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    
-    /* Define um tamanho similar aos outros botões */
-    width: 36px;
+.toolbar-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    min-width: 36px;
     height: 36px;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+.toolbar-btn:hover {
+    background-color: #f1f5f9;
+}
 
-    /* Estilização da borda e fundo */
-    background-color: transparent;
-    border: 1px solid #D1D5DB; /* Cor cinza do Tailwind que você já usa */
-    border-radius: 0.375rem;   /* Equivalente a 'rounded-md' do Tailwind */
+.toolbar-select {
+    padding: 0 0.5rem;
+    height: 36px;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s;
+    background-color: white;
+}
+
+.toolbar-select:hover {
+    background-color: #f1f5f9;
+}
+
+.toolbar-btn.btn-active {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.color-preview {
+    width: 16px;
+    height: 4px;
+    border: 1px solid #e2e8f0;
+    border-radius: 2px;
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.color-palette {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 8px;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 8px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    z-index: 10;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+}
+
+.color-swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
     cursor: pointer;
-    padding: 4px;
+    border: 1px solid #f1f5f9;
+    transition: transform 0.1s ease;
 }
 
-/* Estiliza a "amostra" de cor dentro do botão para navegadores Chrome/Edge */
-.color-picker-btn::-webkit-color-swatch {
-    border-radius: 0.25rem;
-    border: none;
+.color-swatch:hover {
+    transform: scale(1.15);
+    border-color: #94a3b8;
 }
 
-/* Estiliza a "amostra" de cor dentro do botão para Firefox */
-.color-picker-btn::-moz-color-swatch {
-    border-radius: 0.25rem;
-    border: none;
+.toolbar-separator {
+    width: 1px;
+    height: 20px;
+    background-color: #e5e7eb;
+    margin: 0 4px;
 }
+
+.modal-label {
+    width: 100%;
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+.modal-input-field {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+}
+
 
 /* Estilização da barra de rolagem */
 ::-webkit-scrollbar {
@@ -114,15 +201,57 @@ body {
     background: #94a3b8;
 }
 
-/* NOVOS ESTILOS PARA MODAL DE RESUMOS */
 #summaries-list-container {
     overflow-y: auto;
 }
 
-/* Remove o marcador padrão do <summary> */
 summary {
     list-style: none;
 }
 summary::-webkit-details-marker {
     display: none;
+}
+
+/* ================================================================== */
+/* BARRA LATERAL RECOLHÍVEL                                          */
+/* ================================================================== */
+
+#toggle-sidebar-btn {
+    position: absolute;
+    top: 50%;
+    left: calc(16rem + 14rem); 
+    transform: translateY(-50%);
+    width: 26px;
+    height: 40px;
+    background-color: #3b82f6;
+    color: white;
+    border: 1px solid #d1d5db;
+    border-left: none;
+    border-radius: 0 13px 13px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 2px;
+    cursor: pointer;
+    box-shadow: 2px 0px 4px rgba(0,0,0,0.1);
+    transition: left 0.3s ease-in-out, background-color 0.2s;
+}
+
+#toggle-sidebar-btn:hover {
+    background-color: #2563eb;
+}
+
+#sidebar-wrapper {
+    transition: margin-left 0.3s ease-in-out;
+}
+
+#sidebar-wrapper.collapsed {
+    margin-left: -30rem;
+}
+
+#toggle-sidebar-btn.collapsed {
+    left: 0;
+    transform: translateY(-50%);
+    border-radius: 0 13px 13px 0;
+    box-shadow: 2px 0px 4px rgba(0,0,0,0.2);
 }
