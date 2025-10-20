@@ -921,59 +921,107 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // --- 3. LÓGICA DO PINCEL DE FORMATAÇÃO (ROBUSTA) ---
+    // --- 3. LÓGICA DO PINCEL DE FORMATAÇÃO (REVISADA E ESTÁVEL) ---
     let formatPainterActive = false;
-    let copiedNode = null;
+    let copiedStyles = null; // Usaremos um objeto para guardar os estilos, não um nó.
+
+    // Definimos uma lista de propriedades CSS que são relevantes para a formatação de texto.
+    // Isso evita copiar centenas de estilos desnecessários.
+    const relevantStyles = [
+        'color', 'backgroundColor', 'fontFamily', 'fontSize', 'fontWeight',
+        'fontStyle', 'textDecorationLine', 'textDecorationStyle', 'textDecorationColor',
+        'verticalAlign'
+    ];
 
     if (allToolbarButtons.formatPainterBtn) {
         allToolbarButtons.formatPainterBtn.addEventListener('click', () => {
+            // Se o pincel já estiver ativo, um segundo clique o desativa.
             if (formatPainterActive) {
                 formatPainterActive = false;
+                copiedStyles = null;
                 allToolbarButtons.formatPainterBtn.classList.remove('btn-active');
                 pageContent.style.cursor = 'text';
-                copiedNode = null;
                 return;
             }
-            
+
             const selection = window.getSelection();
-            if (!selection.rangeCount || selection.isCollapsed) return;
-
-            let parent = selection.getRangeAt(0).commonAncestorContainer;
-            if (parent.nodeType !== Node.ELEMENT_NODE) {
-                parent = parent.parentNode;
+            // Validação: Garante que o usuário selecionou um texto antes de tentar copiar o formato.
+            if (!selection.rangeCount || selection.isCollapsed) {
+                showModal('Atenção', 'Para copiar a formatação, primeiro selecione o texto de origem e depois clique no pincel.', { showCancelButton: false, confirmText: 'OK' });
+                return;
             }
 
-            if (parent && parent.id !== 'page-content') {
-                copiedNode = parent.cloneNode(false);
-                formatPainterActive = true;
-                allToolbarButtons.formatPainterBtn.classList.add('btn-active');
-                pageContent.style.cursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18.5,1.15a3.36,3.36,0,0,0-2.38.97L4.6,13.62a1.25,1.25,0,0,0-.35.84V17.5a1.25,1.25,0,0,0,1.25,1.25H8.54a1.25,1.25,0,0,0,.84-.35L20.88,6.88a3.36,3.36,0,0,0,0-4.76,3.36,3.36,0,0,0-2.38-.97ZM8.12,17H6.5V15.38L15.62,6.25l1.63,1.63Zm11-11L17.5,7.62,15.88,6,17.5,4.38a1.86,1.86,0,0,1,2.63,0,1.86,1.86,0,0,1,0,2.63Z"/></svg>'), auto`;
+            // Identifica o elemento base de onde os estilos serão copiados.
+            let sourceElement = selection.getRangeAt(0).commonAncestorContainer;
+            if (sourceElement.nodeType === Node.TEXT_NODE) {
+                sourceElement = sourceElement.parentNode;
             }
+
+            // Pega todos os estilos computados do elemento, garantindo uma cópia fiel.
+            const computedStyle = window.getComputedStyle(sourceElement);
+            copiedStyles = {}; // Limpa estilos antigos e prepara para a nova cópia.
+
+            // Itera sobre nossa lista de estilos relevantes e os armazena no objeto.
+            for (const style of relevantStyles) {
+                copiedStyles[style] = computedStyle[style];
+            }
+
+            // Ativa o modo "Pincel de Formatação" na UI.
+            formatPainterActive = true;
+            allToolbarButtons.formatPainterBtn.classList.add('btn-active');
+            pageContent.style.cursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18.5,1.15a3.36,3.36,0,0,0-2.38.97L4.6,13.62a1.25,1.25,0,0,0-.35.84V17.5a1.25,1.25,0,0,0,1.25,1.25H8.54a1.25,1.25,0,0,0,.84-.35L20.88,6.88a3.36,3.36,0,0,0,0-4.76,3.36,3.36,0,0,0-2.38-.97ZM8.12,17H6.5V15.38L15.62,6.25l1.63,1.63Zm11-11L17.5,7.62,15.88,6,17.5,4.38a1.86,1.86,0,0,1,2.63,0,1.86,1.86,0,0,1,0,2.63Z"/></svg>'), auto`;
         });
     }
 
     if (pageContent) {
         pageContent.addEventListener('mouseup', () => {
-            if (formatPainterActive && copiedNode && window.getSelection().toString().length > 0) {
-                const selection = window.getSelection();
-                if (selection.rangeCount) {
-                    const range = selection.getRangeAt(0);
-                    const nodeToApply = copiedNode.cloneNode(false);
-                    try {
-                        range.surroundContents(nodeToApply);
-                    } catch (e) {
-                        console.error("Não foi possível aplicar a formatação:", e);
-                    }
+            // A função só executa se o pincel estiver ativo, tiver estilos copiados e o usuário tiver selecionado um texto de destino.
+            const selection = window.getSelection();
+            if (!formatPainterActive || !copiedStyles || !selection.rangeCount || selection.isCollapsed) {
+                return;
+            }
+
+            try {
+                // Cria um SPAN que será nosso "contêiner de formatação".
+                const span = document.createElement('span');
+
+                // Aplica cada estilo copiado diretamente no nosso novo SPAN.
+                for (const style in copiedStyles) {
+                    span.style[style] = copiedStyles[style];
                 }
                 
+                // Pega o intervalo da seleção atual.
+                const range = selection.getRangeAt(0);
+
+                // TÉCNICA ROBUSTA:
+                // 1. Extrai o conteúdo selecionado (os nós de texto/HTML) do documento.
+                const selectedContent = range.extractContents();
+                
+                // 2. Anexa o conteúdo extraído dentro do nosso SPAN estilizado.
+                span.appendChild(selectedContent);
+
+                // 3. Insere o SPAN (agora com o conteúdo dentro) de volta no documento,
+                //    no mesmo lugar onde a seleção estava.
+                range.insertNode(span);
+                
+                // Opcional, mas melhora a experiência: move o cursor para o final do texto formatado.
+                selection.collapseToEnd();
+
+            } catch (e) {
+                console.error("Erro ao tentar aplicar a formatação com o pincel:", e);
+                // Se algo der muito errado, pelo menos avisamos no console.
+            } finally {
+                // Desativa o modo pincel após o uso, garantindo que ele não será aplicado novamente por engano.
                 formatPainterActive = false;
-                copiedNode = null;
-                if (allToolbarButtons.formatPainterBtn) allToolbarButtons.formatPainterBtn.classList.remove('btn-active');
+                copiedStyles = null;
+                if (allToolbarButtons.formatPainterBtn) {
+                    allToolbarButtons.formatPainterBtn.classList.remove('btn-active');
+                }
                 pageContent.style.cursor = 'text';
-                selection.removeAllRanges();
             }
         });
     }
+
 
     // --- 4. NOVOS LISTENERS DE FORMATAÇÃO ---
     if(allToolbarButtons.undoBtn) allToolbarButtons.undoBtn.addEventListener('click', () => document.execCommand('undo'));
@@ -1059,8 +1107,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             // ===============================================
                         } else {
                            // Se a URL for inválida, apenas insere o texto (como fallback)
-                           savedRange.deleteContents();
-                           savedRange.insertNode(document.createTextNode(text));
+                            savedRange.deleteContents();
+                            savedRange.insertNode(document.createTextNode(text));
                         }
 
                     }, 0); 
@@ -1069,7 +1117,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ***** INÍCIO DAS ALTERAÇÕES: LÓGICA DO BOTÃO DE RECOLHER/EXPANDIR *****
     const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
     const sidebarWrapper = document.getElementById('sidebar-wrapper');
     const toggleIcon = document.getElementById('toggle-icon');
@@ -1090,7 +1137,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    // ***** FIM DAS ALTERAÇÕES *****
 
 
     // --- 5. LÓGICA OTIMIZADA PARA ATUALIZAR O ESTADO DOS BOTÕES ---
