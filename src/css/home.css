@@ -1,0 +1,297 @@
+/* src/css/home.css */
+
+/* Definição da fonte Inter para todo o corpo */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc; /* Um cinza muito claro para o fundo geral */
+    color: #1f2937; /* Cor do texto padrão (gray-800) */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
+}
+
+/* Barra de Navegação Fixa no topo */
+.navbar-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Títulos de Seção */
+.section-title {
+    color: #1e3a8a; /* Azul escuro para títulos */
+    position: relative;
+    padding-bottom: 8px; /* Espaço para o underline */
+    transition: color 0.3s ease;
+}
+
+/* Underline para títulos de seção */
+.section-title::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 3px;
+    background-color: #2563EB; /* Azul VSB */
+    margin-top: 6px;
+    margin-left: 0;
+    margin-right: auto;
+    transition: background-color 0.3s ease;
+}
+
+/* Estilo Base para Cartões (Caderno, Item Recente) */
+.notebook-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease, border-color 0.3s ease;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    padding-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+    overflow: visible !important;
+}
+
+/* Efeito de Hover para Cartões */
+.notebook-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+}
+
+/* Capa do Cartão do Caderno (para "Meus Cadernos" e "Documentos Recentes") */
+.notebook-card-cover {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Corpo do Cartão do Caderno */
+.notebook-card .p-4 {
+    flex-grow: 1;
+    padding: 0.75rem;
+    overflow: visible !important;
+}
+
+/* Rodapé do Cartão do Caderno */
+.notebook-card .p-3 {
+    border-top: 1px solid #f3f4f6;
+    text-align: right;
+    padding: 0.5rem;
+}
+
+/* Estilo para a mensagem de "Nenhum caderno/documento" */
+#no-notebooks-message, #no-recent-documents-message {
+    font-style: italic;
+    color: #6b7280; /* text-gray-500 */
+    font-size: 0.875rem; /* text-sm */
+}
+
+/* Estilos para o Modal */
+.modal-overlay {
+    transition: opacity 0.3s ease-out;
+}
+
+.modal-content {
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out, background-color 0.3s ease;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+}
+
+/* Correções para o Dropdown */
+#my-notebooks-grid,
+#recent-documents-grid,
+section {
+    overflow: visible !important;
+}
+.notebook-card .p-4 > .absolute {
+    overflow: visible !important;
+}
+.notebook-options-dropdown {
+    z-index: 99999 !important;
+    position: absolute; 
+    right: 0; 
+    top: calc(100% + 5px);
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Estilos para a Pesquisa */
+.search-result-item {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: all 0.2s ease-in-out;
+    display: block;
+}
+.search-result-item:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+.search-result-item .result-title {
+    color: #1e3a8a;
+    font-weight: 600;
+}
+.search-result-item .result-path {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+.search-result-item .result-snippet {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-top: 0.5rem;
+}
+.search-result-item .result-snippet mark {
+    background-color: #fef3c7;
+    color: #92400e;
+    font-weight: 600;
+    padding: 2px;
+    border-radius: 3px;
+}
+
+/* ================================================================== */
+/* INÍCIO: ESTILOS PARA O DARK MODE                                   */
+/* Estas regras só serão aplicadas quando o <body> tiver a classe 'dark-mode' */
+/* ================================================================== */
+
+body.dark-mode {
+    background-color: #111827; /* Fundo principal (gray-900) */
+    color: #d1d5db; /* Cor de texto principal (gray-300) */
+}
+
+.dark-mode .navbar-sticky {
+    background-color: #1f2937; /* Fundo da navbar (gray-800) */
+    border-bottom-color: #374151; /* Borda da navbar (gray-700) */
+}
+
+/* Seções que eram brancas */
+.dark-mode section.bg-white {
+    background-color: #1f2937; /* Fundo das seções (gray-800) */
+}
+
+/* Títulos e textos principais */
+.dark-mode h1, .dark-mode h2, .dark-mode h3 {
+    color: #f9fafb; /* Títulos (gray-50) */
+}
+.dark-mode .section-title {
+    color: #93c5fd; /* Títulos de seção (blue-300) */
+}
+.dark-mode .section-title::after {
+    background-color: #60a5fa; /* Underline dos títulos (blue-400) */
+}
+.dark-mode #user-display-name {
+    color: #d1d5db; /* Nome do usuário na navbar (gray-300) */
+}
+
+/* Cartões */
+.dark-mode .notebook-card {
+    background-color: #1f2937; /* Fundo dos cartões (gray-800) */
+    border-color: #374151; /* Borda dos cartões (gray-700) */
+}
+.dark-mode .notebook-card:hover {
+    border-color: #60a5fa; /* Borda do cartão em hover (blue-400) */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Input de Pesquisa */
+.dark-mode #search-input {
+    background-color: #374151; /* Fundo do input (gray-700) */
+    border-color: #4b5563; /* Borda do input (gray-600) */
+    color: #f9fafb; /* Cor do texto digitado (gray-50) */
+}
+.dark-mode #search-input::placeholder {
+    color: #9ca3af; /* Cor do placeholder (gray-400) */
+}
+
+/* Resultados da Pesquisa */
+.dark-mode .search-result-item {
+    background-color: #1f2937; /* Fundo do item (gray-800) */
+    border-color: #374151; /* Borda do item (gray-700) */
+}
+.dark-mode .search-result-item:hover {
+    border-color: #60a5fa; /* Borda do item em hover (blue-400) */
+}
+.dark-mode .search-result-item .result-title {
+    color: #93c5fd; /* Título do resultado (blue-300) */
+}
+.dark-mode .search-result-item .result-path {
+    color: #9ca3af; /* Caminho do resultado (gray-400) */
+}
+.dark-mode .search-result-item .result-snippet {
+    color: #d1d5db; /* Snippet (gray-300) */
+}
+.dark-mode .search-result-item .result-snippet mark {
+    background-color: #4338ca; /* Fundo do highlight (indigo-700) */
+    color: #e0e7ff; /* Cor do texto no highlight (indigo-100) */
+}
+
+/* Modal */
+.dark-mode .modal-content {
+    background-color: #1f2937; /* Fundo do modal (gray-800) */
+}
+.dark-mode #vsb-modal-title, .dark-mode #vsb-modal-input {
+    color: #f9fafb;
+}
+.dark-mode #vsb-modal-message, .dark-mode p {
+    color: #d1d5db;
+}
+.dark-mode #vsb-modal-cancel-btn {
+    background-color: #4b5563; /* Botão cancelar (gray-600) */
+    color: #f9fafb;
+}
+.dark-mode #vsb-modal-cancel-btn:hover {
+    background-color: #6b7280; /* Hover botão cancelar (gray-500) */
+}
+
+/* Dropdown do Usuário */
+.dark-mode #user-menu-dropdown {
+    background-color: #1f2937; /* Fundo do dropdown (gray-800) */
+    --tw-ring-color: rgba(255, 255, 255, 0.1);
+}
+.dark-mode #user-menu-dropdown a {
+    color: #d1d5db;
+}
+.dark-mode #user-menu-dropdown a:hover {
+    background-color: #374151; /* Hover nos itens do menu (gray-700) */
+}
+.dark-mode #user-menu-dropdown a#logout-button {
+    color: #f87171; /* Botão Sair (red-400) */
+}
+.dark-mode #user-menu-dropdown a#logout-button:hover {
+    background-color: #450a0a; /* Hover Sair (red-900) */
+    color: #fecaca; /* Texto Hover Sair (red-200) */
+}
+
+/* Scrollbar personalizada para Dark Mode */
+.dark-mode ::-webkit-scrollbar-track {
+    background: #1f2937; /* Trilha (gray-800) */
+}
+.dark-mode ::-webkit-scrollbar-thumb {
+    background: #4b5563; /* Polegar (gray-600) */
+}
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280; /* Polegar em hover (gray-500) */
+}
