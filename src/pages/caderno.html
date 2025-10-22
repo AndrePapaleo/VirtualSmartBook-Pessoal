@@ -7,9 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="../css/caderno.css">
     <script type="module" src="../js/firebase-init.js"></script>
-    
+
     <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -39,19 +44,29 @@
                     </button>
                 </div>
             </div>
-        </header>
+            </header>
 
         <div class="bg-white p-3 border-b border-gray-200 flex items-center justify-between shadow-md flex-wrap gap-y-2 flex-shrink-0">
-            <div class="flex items-center space-x-3 flex-shrink-0">
-                <select id="font-family-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+            <div class="flex items-center space-x-2 flex-wrap">
+                
+                <button id="undo-btn" class="toolbar-btn" title="Desfazer (Ctrl+Z)"><i class="fas fa-rotate-left"></i></button>
+                <button id="redo-btn" class="toolbar-btn" title="Refazer (Ctrl+Y)"><i class="fas fa-rotate-right"></i></button>
+                <div class="toolbar-separator"></div>
+
+                <button id="format-painter-btn" class="toolbar-btn" title="Copiar formatação"><i class="fas fa-paint-roller"></i></button>
+                <div class="toolbar-separator"></div>
+
+                <select id="font-family-select" class="toolbar-select">
                     <option value="Inter, sans-serif">Inter</option>
+                    <option value="Montserrat, sans-serif">Montserrat</option>
+                    <option value="Lora, serif">Lora</option>
                     <option value="Arial, sans-serif">Arial</option>
                     <option value="Verdana, sans-serif">Verdana</option>
                     <option value="Georgia, serif">Georgia</option>
                     <option value="Times New Roman, serif">Times New Roman</option>
                     <option value="Courier New, monospace">Courier New</option>
                 </select>
-                <select id="font-size-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                <select id="font-size-select" class="toolbar-select w-20">
                     <option value="1">8px</option>
                     <option value="2">10px</option>
                     <option value="3" selected>12px</option>
@@ -60,11 +75,34 @@
                     <option value="6">18px</option>
                     <option value="7">24px</option>
                 </select>
+                <div class="toolbar-separator"></div>
+
                 <button id="bold-btn" class="toolbar-btn font-bold">B</button>
                 <button id="italic-btn" class="toolbar-btn italic">I</button>
                 <button id="underline-btn" class="toolbar-btn underline">U</button>
                 <button id="strikethrough-btn" class="toolbar-btn"><s>S</s></button>
-                <select id="heading-select" class="p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                
+                <div class="relative">
+                    <button id="text-color-btn" class="toolbar-btn" title="Cor do Texto">
+                        <i class="fas fa-font"></i>
+                        <div class="color-preview" id="text-color-preview" style="background-color: #000000;"></div>
+                    </button>
+                    <div id="text-color-palette" class="color-palette hidden"></div>
+                </div>
+        
+                <div class="relative">
+                    <button id="highlight-color-btn" class="toolbar-btn" title="Cor do Destaque">
+                        <i class="fas fa-highlighter"></i>
+                        <div class="color-preview" id="highlight-color-preview" style="background-color: #FFFF00;"></div>
+                    </button>
+                    <div id="highlight-color-palette" class="color-palette hidden"></div>
+                </div>
+                <div class="toolbar-separator"></div>
+                
+                <button id="link-btn" class="toolbar-btn" title="Inserir link"><i class="fas fa-link"></i></button>
+                <div class="toolbar-separator"></div>
+
+                <select id="heading-select" class="toolbar-select">
                     <option value="p">Normal</option>
                     <option value="h1">Título 1</option>
                     <option value="h2">Título 2</option>
@@ -74,9 +112,16 @@
                 <button id="align-center-btn" class="toolbar-btn"><i class="fas fa-align-center"></i></button>
                 <button id="align-right-btn" class="toolbar-btn"><i class="fas fa-align-right"></i></button>
                 <button id="align-justify-btn" class="toolbar-btn"><i class="fas fa-align-justify"></i></button>
+                <div class="toolbar-separator"></div>
+
                 <button id="ul-btn" class="toolbar-btn"><i class="fas fa-list-ul"></i></button>
                 <button id="ol-btn" class="toolbar-btn"><i class="fas fa-list-ol"></i></button>
-                <button id="remove-format-btn" class="toolbar-btn"><i class="fas fa-eraser"></i></button>
+                <button id="outdent-btn" class="toolbar-btn" title="Diminuir recuo"><i class="fas fa-outdent"></i></button>
+                <button id="indent-btn" class="toolbar-btn" title="Aumentar recuo"><i class="fas fa-indent"></i></button>
+                <div class="toolbar-separator"></div>
+
+                <button id="blockquote-btn" class="toolbar-btn" title="Citação"><i class="fas fa-quote-left"></i></button>
+                <button id="remove-format-btn" class="toolbar-btn" title="Limpar formatação"><i class="fas fa-eraser"></i></button>
             </div>
             <div class="flex items-center space-x-4 flex-shrink-0">
                 <button id="view-summaries-btn" title="Ver Resumos Salvos" class="toolbar-icon-btn text-gray-600 hover:text-blue-600 flex items-center space-x-2 bg-gray-100 px-3 py-1.5 rounded-md relative" disabled>
@@ -100,55 +145,68 @@
                     </div>
                     <span id="save-status" class="w-24 text-right text-sm text-gray-500"></span>
                 </div>
-            </div>
+                </div>
         </div>
 
-        <main class="flex-1 flex overflow-hidden">
-            <div id="sections-panel" class="w-64 bg-white border-r border-gray-200 flex flex-col">
-                <div class="p-4 border-b border-gray-200 text-lg font-semibold text-blue-700 flex justify-between items-center flex-shrink-0">
-                    <span>Secções</span>
-                    <div class="flex space-x-2">
-                        <button id="add-section-btn" title="Adicionar Secção" class="toolbar-icon-btn text-gray-500 hover:text-green-600"><i class="fas fa-plus"></i></button>
-                        <button id="rename-section-btn" title="Renomear Secção" class="toolbar-icon-btn text-gray-500 hover:text-blue-600"><i class="fas fa-edit"></i></button>
-                        <button id="delete-section-btn" title="Excluir Secção" class="toolbar-icon-btn text-red-500 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
+        <main class="flex-1 flex overflow-hidden relative">
+            
+            <div id="sidebar-wrapper" class="flex flex-shrink-0">
+                <div id="sections-panel" class="w-64 bg-white border-r border-gray-200 flex flex-col">
+                    <div class="p-4 border-b border-gray-200 text-lg font-semibold text-blue-700 flex justify-between items-center flex-shrink-0">
+                        <span>Sessões</span>
+                        <div class="flex space-x-2">
+                            <button id="add-section-btn" title="Adicionar Sessão" class="toolbar-icon-btn text-gray-500 hover:text-green-600"><i class="fas fa-plus"></i></button>
+                            <button id="rename-section-btn" title="Renomear Sessão" class="toolbar-icon-btn text-gray-500 hover:text-blue-600"><i class="fas fa-edit"></i></button>
+                            <button id="delete-section-btn" title="Excluir Sessão" class="toolbar-icon-btn text-red-500 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
+                        </div>
                     </div>
+                    <div id="sections-list" class="space-y-1 p-2 flex-grow overflow-y-auto"></div>
                 </div>
-                <div id="sections-list" class="space-y-1 p-2 flex-grow overflow-y-auto"></div>
+                <div class="w-56 bg-gray-50 border-r border-gray-200 flex flex-col">
+                    <div class="p-4 border-b border-gray-200 text-lg font-semibold text-blue-700 flex justify-between items-center flex-shrink-0">
+                        <span>Páginas</span>
+                        <div class="flex space-x-2">
+                            <button id="add-page-btn" title="Adicionar Página" class="toolbar-icon-btn text-gray-500 hover:text-green-600"><i class="fas fa-plus"></i></button>
+                            <button id="rename-page-btn" title="Renomear Página" class="toolbar-icon-btn text-gray-500 hover:text-blue-600"><i class="fas fa-edit"></i></button>
+                            <button id="delete-page-btn" title="Excluir Página" class="toolbar-icon-btn text-red-500 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    <div id="pages-list" class="flex-grow space-y-1 p-2 overflow-y-auto"></div>
+                </div>
             </div>
 
-            <div class="w-56 bg-gray-50 border-r border-gray-200 flex flex-col">
-                <div class="p-4 border-b border-gray-200 text-lg font-semibold text-blue-700 flex justify-between items-center flex-shrink-0">
-                    <span>Páginas</span>
-                    <div class="flex space-x-2">
-                        <button id="add-page-btn" title="Adicionar Página" class="toolbar-icon-btn text-gray-500 hover:text-green-600"><i class="fas fa-plus"></i></button>
-                        <button id="rename-page-btn" title="Renomear Página" class="toolbar-icon-btn text-gray-500 hover:text-blue-600"><i class="fas fa-edit"></i></button>
-                        <button id="delete-page-btn" title="Excluir Página" class="toolbar-icon-btn text-red-500 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </div>
-                <div id="pages-list" class="flex-grow space-y-1 p-2 overflow-y-auto"></div>
-            </div>
+            <button id="toggle-sidebar-btn" title="Recolher/Expandir Barra Lateral" class="z-30">
+                <i id="toggle-icon" class="fas fa-chevron-left"></i>
+            </button>
 
-            <div class="flex-1 p-6 bg-white overflow-hidden flex flex-col">
-                <div id="page-render-area" class="flex-1 flex flex-col overflow-y-auto"> 
+            <div id="editor-scroll-wrapper" class="flex-1 bg-white">
+                <div id="page-render-area" class="flex flex-col"> 
                     <h2 id="current-page-title" class="text-3xl font-bold mb-4 text-gray-900">Selecione uma Página</h2>
                     <div id="page-content" class="content-editable-area flex-grow bg-white" contenteditable="true"></div>
                 </div>
             </div>
-        </main>
+            </main>
     </div>
 
     <div id="confirmation-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-[100]">
         <div class="bg-white p-6 rounded-lg shadow-xl w-96 flex flex-col items-center">
             <h3 id="modal-title" class="text-xl font-semibold mb-4">Confirmação</h3>
             <i id="modal-spinner" class="fas fa-spinner fa-spin text-blue-500 text-3xl mb-4 hidden"></i>
-            <p id="modal-message" class="mb-6 text-center"></p>
-            <input type="text" id="modal-input" class="w-full p-2 border border-gray-300 rounded-md mb-4 hidden" placeholder="Novo nome">
-            <div id="modal-buttons" class="flex justify-end space-x-4 w-full">
+            <p id="modal-message" class="mb-4 text-center"></p>
+
+            <label id="modal-label-text" for="modal-input-text" class="modal-label hidden">Texto a ser exibido:</label>
+            <input type="text" id="modal-input-text" class="modal-input-field hidden" placeholder="Ex: Artigo sobre Mitocôndrias">
+
+            <label id="modal-label-url" for="modal-input" class="modal-label hidden">URL do Link:</label>
+            <input type="text" id="modal-input" class="modal-input-field hidden" placeholder="https://...">
+            
+            <div id="modal-buttons" class="flex justify-end space-x-4 w-full mt-4">
                 <button id="modal-cancel-btn" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400">Cancelar</button>
                 <button id="modal-confirm-btn" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Confirmar</button>
             </div>
         </div>
     </div>
+    
     <div id="summaries-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-[99]">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
@@ -188,7 +246,7 @@
             }
         }
 
-        // 2. Adiciona o Listener de Clique no botão (se ele existir)
+        // 2. Adiciona o Listener de Clique no botão
         if (toggleButton) {
             toggleButton.addEventListener('click', () => {
                 body.classList.toggle(DARK_MODE_CLASS);
@@ -205,7 +263,6 @@
             });
         }
     </script>
-
     <script type="module" src="../js/caderno.js"></script>
 </body>
 </html>

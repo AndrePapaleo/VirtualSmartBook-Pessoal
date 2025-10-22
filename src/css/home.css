@@ -4,8 +4,8 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f8fafc; /* Um cinza muito claro para o fundo geral */
-    color: #1f2937; /* Cor do texto padrão (gray-800) */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
+    /* MODIFICAÇÃO: Adicionada transição */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Barra de Navegação Fixa no topo */
@@ -15,7 +15,8 @@ body {
     z-index: 50;
     background-color: #ffffff;
     border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03); /* Sombra mais sutil para a barra de navegação */
+    /* MODIFICAÇÃO: Adicionada transição */
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -24,6 +25,7 @@ body {
     color: #1e3a8a; /* Azul escuro para títulos */
     position: relative;
     padding-bottom: 8px; /* Espaço para o underline */
+    /* MODIFICAÇÃO: Adicionada transição */
     transition: color 0.3s ease;
 }
 
@@ -31,59 +33,59 @@ body {
 .section-title::after {
     content: '';
     display: block;
-    width: 50px;
-    height: 3px;
+    width: 50px; /* Largura do underline ligeiramente menor */
+    height: 3px; /* Espessura do underline ligeiramente menor */
     background-color: #2563EB; /* Azul VSB */
     margin-top: 6px;
-    margin-left: 0;
+    margin-left: 0; /* Alinhado à esquerda para títulos de seção */
     margin-right: auto;
-    transition: background-color 0.3s ease;
 }
 
 /* Estilo Base para Cartões (Caderno, Item Recente) */
 .notebook-card {
+    /* MODIFICAÇÃO: Adicionada transição de cores */
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease, border-color 0.3s ease;
-    border-radius: 0.5rem;
+    border-radius: 0.5rem; /* rounded-lg, um pouco menos arredondado */
     display: flex;
     flex-direction: column;
     background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-    padding-bottom: 1rem;
-    position: relative;
-    z-index: 1;
-    overflow: visible !important;
+    border: 1px solid #e5e7eb; /* border border-gray-200 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04); /* shadow-sm mais leve */
+    padding-bottom: 1rem; /* Adicionado para dar espaço ao dropdown */
+    position: relative; /* Garante que o z-index e posicionamento absoluto do dropdown funcionem */
+    z-index: 1; /* Garante que cada cartão tenha seu próprio contexto de empilhamento */
+    overflow: visible !important; /* NOVO: Garante que o cartão em si não corte */
 }
 
 /* Efeito de Hover para Cartões */
 .notebook-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-    z-index: 10;
+    transform: translateY(-3px); /* Desloca ligeiramente para cima, menos que antes */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08); /* Sombra mais pronunciada, mas ainda leve */
+    z-index: 10; /* Eleva o cartão no hover para que o dropdown apareça acima dos vizinhos */
 }
 
 /* Capa do Cartão do Caderno (para "Meus Cadernos" e "Documentos Recentes") */
 .notebook-card-cover {
-    height: 80px;
+    height: 80px; /* Altura ligeiramente menor */
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Borda mais suave */
+    color: rgba(255, 255, 255, 0.85); /* Cor do ícone */
 }
 
 /* Corpo do Cartão do Caderno */
 .notebook-card .p-4 {
-    flex-grow: 1;
-    padding: 0.75rem;
-    overflow: visible !important;
+    flex-grow: 1; /* Permite que o corpo ocupe o espaço restante */
+    padding: 0.75rem; /* Menos padding */
+    overflow: visible !important; /* NOVO: Garante que o conteúdo do card não corte */
 }
 
 /* Rodapé do Cartão do Caderno */
 .notebook-card .p-3 {
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid #f3f4f6; /* border-t border-gray-100 */
     text-align: right;
-    padding: 0.5rem;
+    padding: 0.5rem; /* Menos padding */
 }
 
 /* Estilo para a mensagem de "Nenhum caderno/documento" */
@@ -95,30 +97,42 @@ body {
 
 /* Estilos para o Modal */
 .modal-overlay {
-    transition: opacity 0.3s ease-out;
+    transition: opacity 0.3s ease-out; /* Transição para opacidade */
 }
 
 .modal-content {
+    /* MODIFICAÇÃO: Adicionada transição de cores */
     transition: transform 0.3s ease-out, opacity 0.3s ease-out, background-color 0.3s ease;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
+    padding: 1.5rem; /* Padding ligeiramente menor */
+    border-radius: 0.75rem; /* rounded-xl, um pouco menos arredondado */
 }
 
-/* Correções para o Dropdown */
+/*
+  CORREÇÃO CHAVE PARA O DROPDOWN:
+  Força overflow: visible nos contêineres de grid e nas seções que os contêm.
+  Isso é necessário se um pai estiver cortando o conteúdo absoluto.
+*/
 #my-notebooks-grid,
 #recent-documents-grid,
-section {
+section { /* Aplica também às tags section para ser mais abrangente */
     overflow: visible !important;
 }
+
+/* NOVO: Garante que o div absoluto que contém o botão de opções e o dropdown não corte. */
+/* Este é o div com class="absolute top-2 right-2" dentro do .p-4 do notebook-card */
 .notebook-card .p-4 > .absolute {
     overflow: visible !important;
 }
+
+/* Estilos para o Dropdown de Opções do Caderno */
 .notebook-options-dropdown {
-    z-index: 99999 !important;
+    z-index: 99999 !important; /* Aumenta AINDA MAIS o z-index para ter prioridade máxima */
     position: absolute; 
     right: 0; 
-    top: calc(100% + 5px);
+    top: calc(100% + 5px); /* Posiciona abaixo do botão, com um pequeno espaçamento */
+    /* will-change: transform; /* Pode ajudar na performance, mas não é a causa do problema */
 }
+
 
 /* Scrollbar personalizada */
 ::-webkit-scrollbar {
@@ -126,55 +140,65 @@ section {
     height: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: #f1f5f9; /* cor da trilha da barra de rolagem (light gray) */
     border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #cbd5e1; /* cor do "polegar" da barra de rolagem (medium gray) */
     border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: #94a3b8; /* cor do "polegar" ao passar o mouse (darker gray) */
 }
 
-/* Estilos para a Pesquisa */
+/* ================================================================== */
+/* INÍCIO: Novos Estilos para a Pesquisa */
+/* ================================================================== */
 .search-result-item {
     background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 1rem;
+    border: 1px solid #e5e7eb; /* border-gray-200 */
+    border-radius: 0.5rem; /* rounded-lg */
+    padding: 1rem; /* p-4 */
     transition: all 0.2s ease-in-out;
-    display: block;
+    display: block; /* Para o <a> preencher o espaço */
 }
+
 .search-result-item:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-color: #3b82f6; /* blue-500 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
     transform: translateY(-2px);
 }
+
 .search-result-item .result-title {
-    color: #1e3a8a;
-    font-weight: 600;
+    color: #1e3a8a; /* text-blue-900 */
+    font-weight: 600; /* font-semibold */
 }
+
 .search-result-item .result-path {
-    font-size: 0.75rem;
-    color: #6b7280;
+    font-size: 0.75rem; /* text-xs */
+    color: #6b7280; /* text-gray-500 */
 }
+
 .search-result-item .result-snippet {
-    font-size: 0.875rem;
-    color: #4b5563;
-    margin-top: 0.5rem;
+    font-size: 0.875rem; /* text-sm */
+    color: #4b5563; /* text-gray-600 */
+    margin-top: 0.5rem; /* mt-2 */
 }
+
 .search-result-item .result-snippet mark {
-    background-color: #fef3c7;
-    color: #92400e;
+    background-color: #fef3c7; /* yellow-200 */
+    color: #92400e; /* yellow-900 */
     font-weight: 600;
     padding: 2px;
     border-radius: 3px;
 }
+/* ================================================================== */
+/* FIM: Novos Estilos para a Pesquisa */
+/* ================================================================== */
+
 
 /* ================================================================== */
-/* INÍCIO: ESTILOS PARA O DARK MODE                                   */
-/* Estas regras só serão aplicadas quando o <body> tiver a classe 'dark-mode' */
+/* INÍCIO: ESTILOS PARA O DARK MODE (ADICIONADO)                       */
 /* ================================================================== */
 
 body.dark-mode {
@@ -188,13 +212,21 @@ body.dark-mode {
 }
 
 /* Seções que eram brancas */
-.dark-mode section.bg-white {
+.dark-mode section.bg-white,
+.dark-mode .bg-white {
     background-color: #1f2937; /* Fundo das seções (gray-800) */
 }
 
 /* Títulos e textos principais */
-.dark-mode h1, .dark-mode h2, .dark-mode h3 {
+.dark-mode h1, .dark-mode h2, .dark-mode h3,
+.dark-mode .text-gray-800 {
     color: #f9fafb; /* Títulos (gray-50) */
+}
+.dark-mode .text-gray-700 {
+    color: #d1d5db; /* gray-300 */
+}
+.dark-mode .text-gray-600 {
+    color: #9ca3af; /* gray-400 */
 }
 .dark-mode .section-title {
     color: #93c5fd; /* Títulos de seção (blue-300) */
@@ -257,6 +289,10 @@ body.dark-mode {
 }
 .dark-mode #vsb-modal-message, .dark-mode p {
     color: #d1d5db;
+}
+.dark-mode #vsb-modal-input {
+    background-color: #374151;
+    border-color: #4b5563;
 }
 .dark-mode #vsb-modal-cancel-btn {
     background-color: #4b5563; /* Botão cancelar (gray-600) */

@@ -5,31 +5,29 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f8fafc;
-    overflow: hidden; /* Impede a rolagem do corpo da página principal */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
+    overflow: hidden;
+    /* MODIFICAÇÃO: Adicionada transição */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Adicionando transições aos elementos principais */
-header, #sections-panel, .w-56, .flex-1.p-6 {
+/* MODIFICAÇÃO: Adicionada transição para elementos principais */
+header, #sections-panel, .w-56, #editor-scroll-wrapper, .bg-white {
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
-
 h1, h2, h3 {
     transition: color 0.3s ease;
 }
 
 
 /* ================================================================== */
-/* PAINÉIS LATERAIS (SECÇÕES E PÁGINAS)                               */
+/* PAINÉIS LATERAIS (SESSÕES E PÁGINAS)                               */
 /* ================================================================== */
 
-/* Define os painéis laterais como contentores flexíveis verticais */
 #sections-panel, .pages-sidebar {
     display: flex;
     flex-direction: column;
 }
 
-/* Faz com que a lista cresça e adicione uma barra de rolagem quando necessário */
 #sections-list, #pages-list {
     flex-grow: 1;
     overflow-y: auto;
@@ -37,11 +35,11 @@ h1, h2, h3 {
 }
 
 .active-item {
-    background-color: #3b82f6; /* azul-500 */
+    background-color: #3b82f6;
     color: white;
 }
 .active-item:hover {
-    background-color: #2563eb; /* azul-600 */
+    background-color: #2563eb;
 }
 
 
@@ -49,67 +47,147 @@ h1, h2, h3 {
 /* ÁREA DE CONTEÚDO PRINCIPAL (EDITOR)                                */
 /* ================================================================== */
 
+/* O contêiner PAI que agora segura a barra de rolagem */
+#editor-scroll-wrapper {
+    overflow-y: auto; /* Garante que a barra de rolagem apareça aqui, na extrema direita */
+}
+
+/* A "folha de papel" visual que fica DENTRO da área de rolagem */
+#page-render-area {
+  /* ***** ALTERAÇÃO AQUI ***** */
+  max-width: 1100px;  /* Aumentamos a largura da "folha" de 900px para 1100px */
+  margin: 0 auto;    /* Mantém a folha centralizada */
+  padding: 3rem 3rem; /* Diminuímos o padding lateral de 4rem para 3rem */
+}
+
+
 .content-editable-area {
     word-break: break-word;
     white-space: pre-wrap;
-    padding: 1rem;
-    min-height: 180px;
+    min-height: 375px;
     outline: none;
     border: none;
     box-shadow: none;
-    transition: background-color 0.3s ease;
+    /* MODIFICAÇÃO: Adicionada transição */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+.content-editable-area blockquote {
+    margin-left: 20px;
+    padding-left: 15px;
+    border-left: 3px solid #d1d5db;
+    /* MODIFICAÇÃO: Adicionada transição */
+    transition: border-color 0.3s ease;
+}
+
 
 /* ================================================================== */
 /* UTILITÁRIOS E BOTÕES                                             */
 /* ================================================================== */
 .toolbar-icon-btn {
     padding: 0.5rem;
-    border-radius: 0.375rem; /* rounded-md */
+    border-radius: 0.375rem;
+    /* MODIFICAÇÃO: Linha completada e transição de cor adicionada */
     transition: background-color 0.2s, color 0.2s;
 }
+
+/* MODIFICAÇÃO: Estilos adicionados para novos botões e elementos */
+
 .toolbar-icon-btn:hover:not(:disabled) {
-    background-color: #f1f5f9; /* gray-100 */
-}
-.toolbar-icon-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    background-color: #f3f4f6; /* gray-100 */
 }
 
-/* Estilização da barra de rolagem */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+.toolbar-btn {
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    border: 1px solid #d1d5db; /* gray-300 */
+}
+.toolbar-btn:hover:not(.active-format) { background-color: #f3f4f6; /* gray-100 */ }
+.toolbar-btn.active-format {
+    background-color: #dbeafe; /* blue-100 */
+    color: #1d4ed8; /* blue-700 */
+    border-color: #93c5fd; /* blue-300 */
 }
 
-::-webkit-scrollbar-track {
-    background: #f1f5f9;
+
+.toolbar-select {
+    padding: 0.375rem;
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
+.toolbar-separator {
+    width: 1px;
+    background-color: #e5e7eb; /* gray-200 */
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    height: 24px;
+    transition: background-color 0.3s ease;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+.color-palette {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 5px;
+    z-index: 100;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.color-preview {
+    width: 16px;
+    height: 4px;
+    border: 1px solid #777;
+    margin-top: 2px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 4px;
 }
 
-/* NOVOS ESTILOS PARA MODAL DE RESUMOS */
-#summaries-list-container {
-    overflow-y: auto;
+#toggle-sidebar-btn {
+    position: absolute;
+    left: calc(16rem + 14rem); /* w-64 + w-56 */
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-left: 0;
+    padding: 1.5rem 0.25rem;
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    transition: left 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    color: #4b5563; /* gray-600 */
+}
+#toggle-sidebar-btn:hover {
+    background-color: #f9fafb; /* gray-50 */
+}
+#sidebar-wrapper.collapsed + #toggle-sidebar-btn {
+    left: 0;
 }
 
-/* Remove o marcador padrão do <summary> */
-summary {
-    list-style: none;
+.modal-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    text-align: left;
+    width: 100%;
 }
-summary::-webkit-details-marker {
-    display: none;
+.modal-input-field {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
 }
+
 
 /* ================================================================== */
-/* INÍCIO: ESTILOS PARA O DARK MODE                                   */
+/* INÍCIO: ESTILOS PARA O DARK MODE (ADICIONADO E ATUALIZADO)         */
 /* ================================================================== */
 
 body.dark-mode {
@@ -134,7 +212,9 @@ body.dark-mode {
 /* Textos e Títulos */
 .dark-mode h1, .dark-mode h2, .dark-mode h3,
 .dark-mode #active-notebook-name,
-.dark-mode #current-page-title {
+.dark-mode #current-page-title,
+.dark-mode .text-gray-900,
+.dark-mode .text-gray-800 {
     color: #f9fafb; /* Textos de destaque (gray-50) */
 }
 
@@ -160,6 +240,10 @@ body.dark-mode {
     background-color: #374151; /* Fundo (gray-700) */
     color: #d1d5db;
 }
+.dark-mode .bg-gray-100:hover {
+    background-color: #4b5563; /* gray-600 */
+}
+
 
 /* Cronômetro */
 .dark-mode .bg-blue-100 {
@@ -168,9 +252,16 @@ body.dark-mode {
 }
 
 /* Área de Edição */
+.dark-mode #editor-scroll-wrapper {
+    background-color: #111827; /* Fundo da área de scroll (gray-900) */
+}
+.dark-mode #page-render-area,
 .dark-mode #page-content {
     background-color: #1f2937; /* Fundo do editor (gray-800) */
     color: #d1d5db;
+}
+.dark-mode .content-editable-area blockquote {
+    border-left-color: #4b5563; /* gray-600 */
 }
 
 /* Modais */
@@ -186,8 +277,15 @@ body.dark-mode {
     background-color: #4b5563;
     color: #f9fafb;
 }
+.dark-mode #modal-cancel-btn:hover {
+    background-color: #6b7280;
+}
 
-.dark-mode input#modal-input {
+.dark-mode .modal-label {
+    color: #d1d5db;
+}
+.dark-mode .modal-input-field,
+.dark-mode #modal-input {
     background-color: #374151;
     border-color: #4b5563;
     color: #f9fafb;
@@ -201,14 +299,51 @@ body.dark-mode {
     background-color: #374151;
 }
 
-/* Selects da barra de ferramentas */
-.dark-mode select {
-    background-color: #374151;
+/* Botões da Barra de Ferramentas do Editor */
+.dark-mode .toolbar-btn {
+    background-color: #1f2937; /* gray-800 */
+    color: #d1d5db; /* gray-300 */
+    border-color: #4b5563; /* gray-600 */
+}
+.dark-mode .toolbar-btn:hover:not(.active-format) {
+    background-color: #374151; /* gray-700 */
+}
+.dark-mode .toolbar-btn.active-format {
+    background-color: #1e40af; /* blue-800 */
+    color: #dbeafe; /* blue-200 */
+    border-color: #3b82f6; /* blue-500 */
+}
+.dark-mode .toolbar-select {
+    background-color: #1f2937;
+    color: #d1d5db;
     border-color: #4b5563;
-    color: #f9fafb;
+}
+.dark-mode .toolbar-separator {
+    background-color: #374151; /* gray-700 */
+}
+.dark-mode .color-palette {
+    background-color: #1f2937;
+    border-color: #374151;
+}
+.dark-mode .color-preview {
+    border-color: #9ca3af; /* gray-400 */
+}
+
+/* Botão de Recolher Sidebar */
+.dark-mode #toggle-sidebar-btn {
+    background-color: #1f2937; /* gray-800 */
+    border-color: #374151; /* gray-700 */
+    color: #9ca3af; /* gray-400 */
+}
+.dark-mode #toggle-sidebar-btn:hover {
+    background-color: #374151; /* gray-700 */
 }
 
 /* Scrollbar */
+.dark-mode ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
 .dark-mode ::-webkit-scrollbar-track {
     background: #1f2937;
 }
