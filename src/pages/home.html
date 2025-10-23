@@ -23,21 +23,27 @@
                 VSB <span class="font-normal text-gray-700 text-base ml-2 hidden sm:inline">| Virtual Smart Book</span>
             </a>
 
-            <div class="relative">
-                <button id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" aria-expanded="false" aria-haspopup="true">
-                    <span class="sr-only">Abrir menu do usuário</span>
-                    <i id="user-profile-icon" class="fas fa-user-circle text-2xl text-blue-600"></i>
-                    <span class="ml-2 font-medium text-gray-700 hidden md:inline" id="user-display-name">Carregando...</span>
-                    <i class="fas fa-chevron-down ml-2 text-gray-500 text-xs"></i>
-                </button>
+            <div class="flex items-center space-x-2">
+                
+                <button id="dark-mode-toggle-btn" title="Alternar Modo Noturno" class="h-10 w-10 flex items-center justify-center rounded-full text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-moon text-lg"></i>
+                    <i class="fas fa-sun text-lg" style="display: none;"></i> </button>
 
-                <div id="user-menu-dropdown" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
-                    <a href="/src/pages/perfil.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="profile-link">Seu Perfil</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="settings-link">Configurações</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50" role="menuitem" tabindex="-1" id="logout-button">Sair</a>
+                <div class="relative">
+                    <button id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" aria-expanded="false" aria-haspopup="true">
+                        <span class="sr-only">Abrir menu do usuário</span>
+                        <i id="user-profile-icon" class="fas fa-user-circle text-2xl text-blue-600"></i>
+                        <span class="ml-2 font-medium text-gray-700 hidden md:inline" id="user-display-name">Carregando...</span>
+                        <i class="fas fa-chevron-down ml-2 text-gray-500 text-xs"></i>
+                    </button>
+
+                    <div id="user-menu-dropdown" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                        <a href="/src/pages/perfil.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="profile-link">Seu Perfil</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="settings-link">Configurações</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50" role="menuitem" tabindex="-1" id="logout-button">Sair</a>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </div> </div>
     </nav>
 
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">

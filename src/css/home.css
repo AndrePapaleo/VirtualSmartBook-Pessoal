@@ -187,3 +187,206 @@ section { /* Aplica também às tags section para ser mais abrangente */
 /* ================================================================== */
 /* FIM: Novos Estilos para a Pesquisa */
 /* ================================================================== */
+
+
+/* ================================================================== */
+/* INÍCIO: MODO NOTURNO (HOME PAGE) */
+/* ================================================================== */
+
+/* --- Controles do Ícone --- */
+body.dark-mode #dark-mode-toggle-btn .fa-sun {
+    display: inline-block; /* Sol aparece no modo noturno */
+}
+body.dark-mode #dark-mode-toggle-btn .fa-moon {
+    display: none; /* Lua desaparece no modo noturno */
+}
+
+/* --- Cores Globais --- */
+body.dark-mode {
+    background-color: #0f172a; /* Fundo principal (Slate 950) */
+    color: #e2e8f0; /* Cor do texto (Slate 200) */
+}
+
+/* --- Header (Barra Superior) --- */
+body.dark-mode nav.navbar-sticky {
+    background-color: #1e293b; /* Fundo do header (Slate 800) */
+    border-color: #334155; /* Borda (Slate 700) */
+}
+body.dark-mode nav a span.text-gray-700 {
+    color: #cbd5e1; /* Slate 300 */
+}
+body.dark-mode #dark-mode-toggle-btn {
+    color: #94a3b8; /* Ícone (Slate 400) */
+}
+body.dark-mode #dark-mode-toggle-btn:hover {
+    background-color: #334155; /* Fundo hover (Slate 700) */
+}
+body.dark-mode #user-display-name {
+    color: #cbd5e1; /* Slate 300 */
+}
+body.dark-mode #user-menu-dropdown {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode #user-menu-dropdown a {
+    color: #e2e8f0;
+}
+body.dark-mode #user-menu-dropdown a:hover {
+    background-color: #334155;
+}
+body.dark-mode #user-menu-dropdown a#logout-button {
+    color: #f87171; /* Vermelho claro */
+}
+body.dark-mode #user-menu-dropdown a#logout-button:hover {
+    background-color: #3f1212; /* Fundo vermelho escuro */
+}
+
+/* --- Conteúdo Principal --- */
+body.dark-mode section.bg-white { /* Card "Inspiração" */
+    background-color: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode p.text-gray-700,
+body.dark-mode p.text-gray-600,
+body.dark-mode p.text-gray-800,
+body.dark-mode h1 span {
+    color: #cbd5e1; /* Tom de texto geral (Slate 300) */
+}
+body.dark-mode .section-title {
+    color: #60a5fa; /* Títulos (Blue 400) */
+}
+body.dark-mode .section-title::after {
+    background-color: #60a5fa; /* Títulos (Blue 400) */
+}
+
+/* --- Barra de Busca --- */
+body.dark-mode #search-input {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+body.dark-mode #search-input::placeholder {
+    color: #64748b; /* Slate 500 */
+}
+body.dark-mode #search-input:focus {
+    border-color: #60a5fa;
+    --tw-ring-color: #60a5fa;
+}
+body.dark-mode #search-form i {
+    color: #64748b;
+}
+
+/* --- Cards (Cadernos e Recentes) --- */
+body.dark-mode .notebook-card {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode .notebook-card:hover {
+    border-color: #334155;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+body.dark-mode .notebook-card .p-3 { /* Rodapé do card */
+    border-top-color: #334155;
+}
+
+/* * ============================================
+ * INÍCIO DA CORREÇÃO DE TEXTO ILEGÍVEL
+ * Sobrescreve as classes de texto do Tailwind dentro dos cards
+ * ============================================
+*/
+body.dark-mode .notebook-card .text-gray-800 { /* Título do Card */
+    color: #e2e8f0; /* Slate 200 */
+}
+body.dark-mode .notebook-card .text-gray-500 { /* Contagem de páginas */
+    color: #94a3b8; /* Slate 400 */
+}
+body.dark-mode .notebook-card .text-gray-400 { /* Data de mod. e botão de opções */
+    color: #94a3b8; /* Slate 400 */
+}
+body.dark-mode .notebook-card .text-gray-400:hover { /* Hover do botão de opções */
+    color: #e2e8f0; /* Slate 200 */
+}
+body.dark-mode .notebook-card .text-gray-700:hover { /* Hover do texto "Renomear" no dropdown */
+    background-color: #334155;
+    color: #e2e8f0;
+}
+/* ============================================
+ * FIM DA CORREÇÃO
+ * ============================================
+*/
+
+body.dark-mode #no-notebooks-message, 
+body.dark-mode #no-recent-documents-message {
+    color: #64748b; /* Slate 500 */
+}
+
+/* --- Resultados da Pesquisa --- */
+body.dark-mode .search-result-item {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode .search-result-item:hover {
+    border-color: #60a5fa;
+}
+body.dark-mode .search-result-item .result-title {
+    color: #93c5fd; /* Blue 300 */
+}
+body.dark-mode .search-result-item .result-path {
+    color: #64748b;
+}
+body.dark-mode .search-result-item .result-snippet {
+    color: #cbd5e1;
+}
+body.dark-mode .search-result-item .result-snippet mark {
+    background-color: #365314; /* green-900 */
+    color: #a3e635; /* lime-400 */
+}
+
+/* --- Modal --- */
+body.dark-mode #vsb-modal .modal-content {
+    background-color: #1e293b;
+}
+body.dark-mode #vsb-modal-title {
+    color: #e2e8f0;
+}
+body.dark-mode #vsb-modal-message {
+    color: #cbd5e1;
+}
+body.dark-mode #vsb-modal-input {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+body.dark-mode #vsb-modal-input::placeholder {
+    color: #64748b;
+}
+body.dark-mode #vsb-modal-cancel-btn {
+    background-color: #334155;
+    color: #e2e8f0;
+}
+body.dark-mode #vsb-modal-cancel-btn:hover {
+    background-color: #475569;
+}
+
+/* --- Footer --- */
+body.dark-mode footer {
+    background-color: #1e293b;
+    color: #64748b;
+    border-top: 1px solid #334155;
+}
+
+/* --- Barra de Rolagem --- */
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #1e293b; /* Fundo (Slate 800) */
+}
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #334155; /* Cor (Slate 700) */
+}
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #475569; /* Hover (Slate 600) */
+}
+/* ================================================================== */
+/* FIM: MODO NOTURNO (HOME PAGE) */
+/* ================================================================== */

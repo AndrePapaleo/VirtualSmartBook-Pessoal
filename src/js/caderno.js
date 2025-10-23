@@ -71,7 +71,43 @@ const renamePageBtn = document.getElementById('rename-page-btn');
 const deletePageBtn = document.getElementById('delete-page-btn');
 const exportMdBtn = document.getElementById('export-md-btn');
 const exportPdfBtn = document.getElementById('export-pdf-btn');
+const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn'); // <-- ADICIONADO
 
+
+// =================================================================================
+// LÓGICA DO MODO NOTURNO (ADICIONADO)
+// =================================================================================
+
+/**
+ * Aplica ou remove a classe 'dark-mode' do body.
+ * @param {boolean} enabled - True para adicionar, false para remover.
+ */
+function applyDarkMode(enabled) {
+    if (enabled) {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+    }
+}
+
+/**
+ * Alterna o modo noturno, atualiza o body e salva no localStorage.
+ */
+function toggleDarkMode() {
+    const isDarkMode = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+}
+
+/**
+ * (IIFE) Inicializa o modo noturno ao carregar o script para evitar "flash"
+ * de tema claro.
+ */
+(function initializeDarkMode() {
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode === 'enabled') {
+        applyDarkMode(true);
+    }
+})();
 
 // =================================================================================
 // PONTO DE ENTRADA E LÓGICA DE DADOS
@@ -503,6 +539,12 @@ function markdownListToHtml(markdown) {
 
 if (exportMdBtn) exportMdBtn.addEventListener('click', exportToMarkdown);
 if (exportPdfBtn) exportPdfBtn.addEventListener('click', exportToPDF);
+
+// ADIÇÃO DO LISTENER DO MODO NOTURNO
+if (darkModeToggleBtn) {
+    darkModeToggleBtn.addEventListener('click', toggleDarkMode);
+}
+// FIM DA ADIÇÃO
 
 if (viewSummariesBtn) {
     viewSummariesBtn.addEventListener('click', () => {
