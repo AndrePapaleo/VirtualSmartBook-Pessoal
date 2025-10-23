@@ -16,6 +16,7 @@ let activePageId = null;
 let saveTimeout = null;
 let studyTimeInterval = null; // Cronômetro para o tempo total do usuário
 let notebookChronometerInterval = null; // Cronômetro para o caderno específico
+let lastEditorSelection = null;
 
 // --- Elementos do DOM ---
 const chronometerDisplayEl = document.getElementById('notebook-chronometer');
@@ -70,7 +71,43 @@ const renamePageBtn = document.getElementById('rename-page-btn');
 const deletePageBtn = document.getElementById('delete-page-btn');
 const exportMdBtn = document.getElementById('export-md-btn');
 const exportPdfBtn = document.getElementById('export-pdf-btn');
+const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn'); // <-- ADICIONADO
 
+
+// =================================================================================
+// LÓGICA DO MODO NOTURNO (ADICIONADO)
+// =================================================================================
+
+/**
+ * Aplica ou remove a classe 'dark-mode' do body.
+ * @param {boolean} enabled - True para adicionar, false para remover.
+ */
+function applyDarkMode(enabled) {
+    if (enabled) {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+    }
+}
+
+/**
+ * Alterna o modo noturno, atualiza o body e salva no localStorage.
+ */
+function toggleDarkMode() {
+    const isDarkMode = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+}
+
+/**
+ * (IIFE) Inicializa o modo noturno ao carregar o script para evitar "flash"
+ * de tema claro.
+ */
+(function initializeDarkMode() {
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode === 'enabled') {
+        applyDarkMode(true);
+    }
+})();
 
 // =================================================================================
 // PONTO DE ENTRADA E LÓGICA DE DADOS
@@ -503,6 +540,12 @@ function markdownListToHtml(markdown) {
 if (exportMdBtn) exportMdBtn.addEventListener('click', exportToMarkdown);
 if (exportPdfBtn) exportPdfBtn.addEventListener('click', exportToPDF);
 
+// ADIÇÃO DO LISTENER DO MODO NOTURNO
+if (darkModeToggleBtn) {
+    darkModeToggleBtn.addEventListener('click', toggleDarkMode);
+}
+// FIM DA ADIÇÃO
+
 if (viewSummariesBtn) {
     viewSummariesBtn.addEventListener('click', () => {
         renderSummariesList();
@@ -757,8 +800,76 @@ if (alignCenterBtn) alignCenterBtn.addEventListener('click', () => document.exec
 if (alignRightBtn) alignRightBtn.addEventListener('click', () => document.execCommand('justifyRight'));
 if (alignJustifyBtn) alignJustifyBtn.addEventListener('click', () => document.execCommand('justifyFull'));
 
-if (ulBtn) ulBtn.addEventListener('click', () => document.execCommand('insertUnorderedList'));
-if (olBtn) olBtn.addEventListener('click', () => document.execCommand('insertOrderedList'));
+if (ulBtn) ulBtn.addEventListener('click', () => {
+        // restore selection saved on mousedown (if any)
+        const sel = window.getSelection();
+        if (lastEditorSelection) {
+            sel.removeAllRanges();
+            sel.addRange(lastEditorSelection);
+            lastEditorSelection = null;
+        }
+        pageContent.focus();
+        setTimeout(() => {
+            document.execCommand('insertUnorderedList');
+            setTimeout(() => {
+                const sel2 = window.getSelection();
+                if (!sel2.rangeCount) return;
+                let node = sel2.getRangeAt(0).commonAncestorContainer;
+                if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+
+                // Se execCommand não criou <ul>, usa insertHTML como fallback
+                if (!node || (node && !node.closest('ul'))) {
+                    try {
+                        const range = sel2.getRangeAt(0).cloneRange();
+                        if (range.collapsed) {
+                            // Insere uma lista vazia
+                            document.execCommand('insertHTML', false, '<ul><li><br></li></ul>');
+                        } else {
+                            const fragment = range.cloneContents();
+                            const div = document.createElement('div');
+                            div.appendChild(fragment);
+                            const html = '<ul><li>' + div.innerHTML + '</li></ul>';
+                            document.execCommand('insertHTML', false, html);
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+            }, 20);
+        }, 0);
+    });
+
+    if (olBtn) olBtn.addEventListener('click', () => {
+        const sel = window.getSelection();
+        if (lastEditorSelection) {
+            sel.removeAllRanges();
+            sel.addRange(lastEditorSelection);
+            lastEditorSelection = null;
+        }
+        pageContent.focus();
+        setTimeout(() => {
+            document.execCommand('insertOrderedList');
+            setTimeout(() => {
+                const sel2 = window.getSelection();
+                if (!sel2.rangeCount) return;
+                let node = sel2.getRangeAt(0).commonAncestorContainer;
+                if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+
+                if (!node || (node && !node.closest('ol'))) {
+                    try {
+                        const range = sel2.getRangeAt(0).cloneRange();
+                        if (range.collapsed) {
+                            document.execCommand('insertHTML', false, '<ol><li><br></li></ol>');
+                        } else {
+                            const fragment = range.cloneContents();
+                            const div = document.createElement('div');
+                            div.appendChild(fragment);
+                            const html = '<ol><li>' + div.innerHTML + '</li></ol>';
+                            document.execCommand('insertHTML', false, html);
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+            }, 20);
+        }, 0);
+    });
 
 if (removeFormatBtn) removeFormatBtn.addEventListener('click', () => document.execCommand('removeFormat'));
 
@@ -849,7 +960,7 @@ document.addEventListener('DOMContentLoaded', function() {
         strikethroughBtn: document.getElementById('strikethrough-btn'),
         textColorBtn: document.getElementById('text-color-btn'),
         highlightColorBtn: document.getElementById('highlight-color-btn'),
-        linkBtn: document.getElementById('link-btn'),
+        // linkBtn removed temporarily
         alignLeftBtn: document.getElementById('align-left-btn'),
         alignCenterBtn: document.getElementById('align-center-btn'),
         alignRightBtn: document.getElementById('align-right-btn'),
@@ -865,6 +976,24 @@ document.addEventListener('DOMContentLoaded', function() {
         textColorPreview: document.getElementById('text-color-preview'),
         highlightColorPreview: document.getElementById('highlight-color-preview')
     };
+
+    // Save/restore selection helper for toolbar clicks (prevents losing selection when toolbar is clicked)
+    const saveSelectionForToolbar = (btn) => {
+        if (!btn) return;
+        btn.addEventListener('mousedown', (e) => {
+            try {
+                const sel = window.getSelection();
+                lastEditorSelection = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+            } catch (err) {
+                lastEditorSelection = null;
+            }
+        });
+    };
+
+    // Attach to buttons that need selection to be preserved
+    saveSelectionForToolbar(allToolbarButtons.ulBtn);
+    saveSelectionForToolbar(allToolbarButtons.olBtn);
+    // link button temporarily removed
 
     // --- 2. LÓGICA DAS PALETAS DE CORES ---
     const textColors = ['#000000', '#434343', '#666666', '#999999', '#B7B7B7', '#FFFFFF', '#3B82F6', '#E06666', '#F6B26B', '#FFD966', '#93C47D', '#8E7CC3'];
@@ -921,59 +1050,188 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // --- 3. LÓGICA DO PINCEL DE FORMATAÇÃO (ROBUSTA) ---
+    // --- 3. LÓGICA DO PINCEL DE FORMATAÇÃO (REVISADA E ESTÁVEL) ---
     let formatPainterActive = false;
-    let copiedNode = null;
+    let copiedStyles = null; // Guardará pares { 'css-property-name': 'value' }
+
+    // Lista em kebab-case — usaremos getPropertyValue e style.setProperty para maior compatibilidade
+    const relevantStyles = [
+        'color', 'background-color', 'font-family', 'font-size', 'font-weight',
+        'font-style', 'text-decoration', 'text-decoration-color', 'vertical-align'
+    ];
+
+    const INLINE_TAGS = ['SPAN','A','B','I','EM','STRONG','U','S','MARK','FONT'];
 
     if (allToolbarButtons.formatPainterBtn) {
         allToolbarButtons.formatPainterBtn.addEventListener('click', () => {
+            // Se já ativo, desativa e limpa o estado
             if (formatPainterActive) {
                 formatPainterActive = false;
+                copiedStyles = null;
                 allToolbarButtons.formatPainterBtn.classList.remove('btn-active');
                 pageContent.style.cursor = 'text';
-                copiedNode = null;
                 return;
             }
-            
+
             const selection = window.getSelection();
-            if (!selection.rangeCount || selection.isCollapsed) return;
-
-            let parent = selection.getRangeAt(0).commonAncestorContainer;
-            if (parent.nodeType !== Node.ELEMENT_NODE) {
-                parent = parent.parentNode;
+            if (!selection || !selection.rangeCount || selection.isCollapsed) {
+                showModal('Atenção', 'Para copiar a formatação, selecione primeiro o texto de origem e depois clique no pincel.', { showCancelButton: false, confirmText: 'OK' });
+                return;
             }
 
-            if (parent && parent.id !== 'page-content') {
-                copiedNode = parent.cloneNode(false);
-                formatPainterActive = true;
-                allToolbarButtons.formatPainterBtn.classList.add('btn-active');
-                pageContent.style.cursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18.5,1.15a3.36,3.36,0,0,0-2.38.97L4.6,13.62a1.25,1.25,0,0,0-.35.84V17.5a1.25,1.25,0,0,0,1.25,1.25H8.54a1.25,1.25,0,0,0,.84-.35L20.88,6.88a3.36,3.36,0,0,0,0-4.76,3.36,3.36,0,0,0-2.38-.97ZM8.12,17H6.5V15.38L15.62,6.25l1.63,1.63Zm11-11L17.5,7.62,15.88,6,17.5,4.38a1.86,1.86,0,0,1,2.63,0,1.86,1.86,0,0,1,0,2.63Z"/></svg>'), auto`;
+            // Encontra o elemento de origem mais apropriado (preferir inline)
+            let sourceElement = selection.getRangeAt(0).commonAncestorContainer;
+            if (sourceElement.nodeType === Node.TEXT_NODE) sourceElement = sourceElement.parentNode;
+
+            // Sobe na árvore até encontrar um elemento inline ou até o container do editor
+            while (sourceElement && sourceElement !== pageContent && (
+                sourceElement.nodeType !== Node.ELEMENT_NODE ||
+                (window.getComputedStyle(sourceElement).display && window.getComputedStyle(sourceElement).display === 'block') ) ) {
+                sourceElement = sourceElement.parentNode;
             }
+
+            if (!sourceElement || sourceElement === pageContent) {
+                // fallback: tenta usar o parent immediato da selection.anchorNode
+                const alt = selection.anchorNode && selection.anchorNode.parentNode;
+                if (alt && alt !== pageContent) sourceElement = alt;
+            }
+
+            if (!sourceElement || sourceElement === pageContent) {
+                showModal('Atenção', 'Não foi possível identificar um elemento de origem para copiar estilos.', { showCancelButton: false, confirmText: 'OK' });
+                return;
+            }
+
+            const computedStyle = window.getComputedStyle(sourceElement);
+            copiedStyles = {};
+
+            for (const prop of relevantStyles) {
+                try {
+                    const value = computedStyle.getPropertyValue(prop);
+                    if (value) copiedStyles[prop] = value.trim();
+                } catch (e) {
+                    // ignore propriedades que não existam
+                }
+            }
+
+            // Se nada foi copiado, aborta
+            if (!Object.keys(copiedStyles).length) {
+                showModal('Atenção', 'Nenhum estilo aplicável foi encontrado na seleção de origem.', { showCancelButton: false, confirmText: 'OK' });
+                copiedStyles = null;
+                return;
+            }
+
+            formatPainterActive = true;
+            allToolbarButtons.formatPainterBtn.classList.add('btn-active');
+            pageContent.style.cursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18.5,1.15a3.36,3.36,0,0,0-2.38.97L4.6,13.62a1.25,1.25,0,0,0-.35.84V17.5a1.25,1.25,0,0,0,1.25,1.25H8.54a1.25,1.25,0,0,0,.84-.35L20.88,6.88a3.36,3.36,0,0,0,0-4.76,3.36,3.36,0,0,0-2.38-.97ZM8.12,17H6.5V15.38L15.62,6.25l1.63,1.63Zm11-11L17.5,7.62,15.88,6,17.5,4.38a1.86,1.86,0,0,1,2.63,0,1.86,1.86,0,0,1,0,2.63Z"/></svg>'), auto`;
         });
     }
 
     if (pageContent) {
         pageContent.addEventListener('mouseup', () => {
-            if (formatPainterActive && copiedNode && window.getSelection().toString().length > 0) {
-                const selection = window.getSelection();
-                if (selection.rangeCount) {
-                    const range = selection.getRangeAt(0);
-                    const nodeToApply = copiedNode.cloneNode(false);
-                    try {
-                        range.surroundContents(nodeToApply);
-                    } catch (e) {
-                        console.error("Não foi possível aplicar a formatação:", e);
+            const selection = window.getSelection();
+            if (!formatPainterActive || !copiedStyles || !selection || !selection.rangeCount || selection.isCollapsed) {
+                return;
+            }
+
+            try {
+                pageContent.focus();
+                const range = selection.getRangeAt(0);
+
+                // Extrai o conteúdo selecionado para um DocumentFragment
+                const extracted = range.extractContents();
+
+                // Função que aplica os estilos copiados a um elemento
+                const applyStyles = (el) => {
+                    for (const prop in copiedStyles) {
+                        try { el.style.setProperty(prop, copiedStyles[prop]); } catch (e) { /* ignore */ }
                     }
+                };
+
+                // Função recursiva que processa um nó do fragmento e retorna um nó estilizado
+                function processNode(node) {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const span = document.createElement('span');
+                        applyStyles(span);
+                        span.textContent = node.textContent;
+                        return span;
+                    }
+
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        const nodename = node.nodeName;
+                        const display = window.getComputedStyle(node).display || '';
+
+                        // Mantemos elementos de bloco (p, div, headings, li, table) e processamos seus filhos
+                        if (display === 'block' || ['P','DIV','H1','H2','H3','H4','H5','H6','LI','TABLE'].includes(nodename)) {
+                            const newBlock = node.cloneNode(false);
+                            // preserva atributos importantes (id, class, etc.)
+                            for (const attr of Array.from(node.attributes || [])) {
+                                try { newBlock.setAttribute(attr.name, attr.value); } catch(e) { /* ignore */ }
+                            }
+                            // processa filhos mantendo estrutura de bloco
+                            for (const child of Array.from(node.childNodes)) {
+                                newBlock.appendChild(processNode(child));
+                            }
+                            return newBlock;
+                        }
+
+                        // Para elementos inline: criamos um clone leve, aplicamos estilos e processamos filhos
+                        const newInline = node.cloneNode(false);
+                        // copia atributos exceto style para evitar sobrescrever
+                        for (const attr of Array.from(node.attributes || [])) {
+                            if (attr.name.toLowerCase() !== 'style') {
+                                try { newInline.setAttribute(attr.name, attr.value); } catch(e) { /* ignore */ }
+                            }
+                        }
+                        applyStyles(newInline);
+                        for (const child of Array.from(node.childNodes)) {
+                            newInline.appendChild(processNode(child));
+                        }
+                        return newInline;
+                    }
+
+                    // Para outros tipos de nós, retorna um clone simples
+                    return node.cloneNode(true);
                 }
-                
+
+                // Processa todo o fragmento extraído
+                const toInsert = document.createDocumentFragment();
+                for (const child of Array.from(extracted.childNodes)) {
+                    toInsert.appendChild(processNode(child));
+                }
+
+                // Insere de volta no documento
+                range.insertNode(toInsert);
+
+                // Reposiciona o cursor após o conteúdo inserido
+                const newRange = document.createRange();
+                // Tenta posicionar logo após o último nó inserido
+                const parent = range.startContainer;
+                let last = null;
+                if (toInsert.lastChild) last = toInsert.lastChild;
+                else if (range.startContainer && range.startContainer.childNodes[range.startOffset]) last = range.startContainer.childNodes[range.startOffset];
+
+                if (last) {
+                    try { newRange.setStartAfter(last); } catch(e) { newRange.selectNodeContents(pageContent); newRange.collapse(false); }
+                } else {
+                    newRange.selectNodeContents(pageContent);
+                    newRange.collapse();
+                }
+
+                newRange.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+
+            } catch (e) {
+                console.error('Erro ao aplicar formatação com o pincel:', e);
+            } finally {
                 formatPainterActive = false;
-                copiedNode = null;
+                copiedStyles = null;
                 if (allToolbarButtons.formatPainterBtn) allToolbarButtons.formatPainterBtn.classList.remove('btn-active');
                 pageContent.style.cursor = 'text';
-                selection.removeAllRanges();
             }
         });
     }
+
 
     // --- 4. NOVOS LISTENERS DE FORMATAÇÃO ---
     if(allToolbarButtons.undoBtn) allToolbarButtons.undoBtn.addEventListener('click', () => document.execCommand('undo'));
@@ -995,81 +1253,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (allToolbarButtons.linkBtn) {
-        allToolbarButtons.linkBtn.addEventListener('click', () => {
-            const selection = window.getSelection();
-            // Salva a seleção ANTES de mostrar o modal
-            const savedRange = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
-            const selectedText = selection.toString().trim();
+    // link button event listener block removed — link feature disabled temporarily
 
-            showModal('Inserir Link', '', {
-                showInput: true,
-                showTextInput: true,
-                textInputValue: selectedText,
-                confirmCallback: (result) => {
-                    // Devolve o foco ao editor, essencial para qualquer abordagem
-                    pageContent.focus();
-
-                    // Adia a execução para garantir que o foco seja processado pelo navegador
-                    setTimeout(() => {
-                        const selection = window.getSelection();
-                        
-                        if (!savedRange) {
-                            console.error("ERRO: Nenhuma seleção foi salva. Impossível criar o link.");
-                            return;
-                        }
-
-                        // Restauramos a seleção salva para saber ONDE agir
-                        selection.removeAllRanges();
-                        selection.addRange(savedRange);
-
-                        const url = result.url.trim();
-                        let text = result.text.trim();
-                        
-                        if (!text) {
-                            text = url;
-                        }
-
-                        if (url && url !== 'https://' && !url.startsWith('javascript:')) {
-                            // ===============================================
-                            // INÍCIO DA MANIPULAÇÃO MANUAL DO DOM
-                            // ===============================================
-                            
-                            // 1. Deleta o conteúdo que estava selecionado (se houver)
-                            savedRange.deleteContents();
-
-                            // 2. Cria o novo elemento de link
-                            const linkElement = document.createElement('a');
-                            linkElement.href = url;
-                            linkElement.textContent = text;
-                            linkElement.target = '_blank';
-                            linkElement.rel = 'noopener noreferrer';
-
-                            // 3. Insere o elemento criado no lugar da seleção
-                            savedRange.insertNode(linkElement);
-                            
-                            // 4. (Opcional, mas bom para UX) Move o cursor para depois do link
-                            savedRange.setStartAfter(linkElement);
-                            savedRange.setEndAfter(linkElement);
-                            selection.removeAllRanges();
-                            selection.addRange(savedRange);
-
-                            // ===============================================
-                            // FIM DA MANIPULAÇÃO MANUAL DO DOM
-                            // ===============================================
-                        } else {
-                           // Se a URL for inválida, apenas insere o texto (como fallback)
-                           savedRange.deleteContents();
-                           savedRange.insertNode(document.createTextNode(text));
-                        }
-
-                    }, 0); 
-                }
-            });
-        });
-    }
-    
-    // ***** INÍCIO DAS ALTERAÇÕES: LÓGICA DO BOTÃO DE RECOLHER/EXPANDIR *****
     const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
     const sidebarWrapper = document.getElementById('sidebar-wrapper');
     const toggleIcon = document.getElementById('toggle-icon');
@@ -1090,7 +1275,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    // ***** FIM DAS ALTERAÇÕES *****
 
 
     // --- 5. LÓGICA OTIMIZADA PARA ATUALIZAR O ESTADO DOS BOTÕES ---
@@ -1120,7 +1304,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleButtonActive(allToolbarButtons.alignCenterBtn, 'justifyCenter');
         toggleButtonActive(allToolbarButtons.alignRightBtn, 'justifyRight');
         toggleButtonActive(allToolbarButtons.alignJustifyBtn, 'justifyFull');
-        checkElementState(allToolbarButtons.linkBtn, 'a');
+        // link button state check removed
         checkElementState(allToolbarButtons.blockquoteBtn, 'blockquote');
     }
 

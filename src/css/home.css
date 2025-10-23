@@ -4,8 +4,6 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f8fafc; /* Um cinza muito claro para o fundo geral */
-    /* MODIFICAÇÃO: Adicionada transição */
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Barra de Navegação Fixa no topo */
@@ -16,8 +14,6 @@ body {
     background-color: #ffffff;
     border-bottom: 1px solid #e5e7eb;
     box-shadow: 0 1px 2px rgba(0,0,0,0.03); /* Sombra mais sutil para a barra de navegação */
-    /* MODIFICAÇÃO: Adicionada transição */
-    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Títulos de Seção */
@@ -25,8 +21,6 @@ body {
     color: #1e3a8a; /* Azul escuro para títulos */
     position: relative;
     padding-bottom: 8px; /* Espaço para o underline */
-    /* MODIFICAÇÃO: Adicionada transição */
-    transition: color 0.3s ease;
 }
 
 /* Underline para títulos de seção */
@@ -43,8 +37,7 @@ body {
 
 /* Estilo Base para Cartões (Caderno, Item Recente) */
 .notebook-card {
-    /* MODIFICAÇÃO: Adicionada transição de cores */
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     border-radius: 0.5rem; /* rounded-lg, um pouco menos arredondado */
     display: flex;
     flex-direction: column;
@@ -101,8 +94,7 @@ body {
 }
 
 .modal-content {
-    /* MODIFICAÇÃO: Adicionada transição de cores */
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out, background-color 0.3s ease;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* Transição para escala e opacidade */
     padding: 1.5rem; /* Padding ligeiramente menor */
     border-radius: 0.75rem; /* rounded-xl, um pouco menos arredondado */
 }
@@ -198,136 +190,203 @@ section { /* Aplica também às tags section para ser mais abrangente */
 
 
 /* ================================================================== */
-/* INÍCIO: ESTILOS PARA O DARK MODE (ADICIONADO)                       */
+/* INÍCIO: MODO NOTURNO (HOME PAGE) */
 /* ================================================================== */
 
+/* --- Controles do Ícone --- */
+body.dark-mode #dark-mode-toggle-btn .fa-sun {
+    display: inline-block; /* Sol aparece no modo noturno */
+}
+body.dark-mode #dark-mode-toggle-btn .fa-moon {
+    display: none; /* Lua desaparece no modo noturno */
+}
+
+/* --- Cores Globais --- */
 body.dark-mode {
-    background-color: #111827; /* Fundo principal (gray-900) */
-    color: #d1d5db; /* Cor de texto principal (gray-300) */
+    background-color: #0f172a; /* Fundo principal (Slate 950) */
+    color: #e2e8f0; /* Cor do texto (Slate 200) */
 }
 
-.dark-mode .navbar-sticky {
-    background-color: #1f2937; /* Fundo da navbar (gray-800) */
-    border-bottom-color: #374151; /* Borda da navbar (gray-700) */
+/* --- Header (Barra Superior) --- */
+body.dark-mode nav.navbar-sticky {
+    background-color: #1e293b; /* Fundo do header (Slate 800) */
+    border-color: #334155; /* Borda (Slate 700) */
+}
+body.dark-mode nav a span.text-gray-700 {
+    color: #cbd5e1; /* Slate 300 */
+}
+body.dark-mode #dark-mode-toggle-btn {
+    color: #94a3b8; /* Ícone (Slate 400) */
+}
+body.dark-mode #dark-mode-toggle-btn:hover {
+    background-color: #334155; /* Fundo hover (Slate 700) */
+}
+body.dark-mode #user-display-name {
+    color: #cbd5e1; /* Slate 300 */
+}
+body.dark-mode #user-menu-dropdown {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode #user-menu-dropdown a {
+    color: #e2e8f0;
+}
+body.dark-mode #user-menu-dropdown a:hover {
+    background-color: #334155;
+}
+body.dark-mode #user-menu-dropdown a#logout-button {
+    color: #f87171; /* Vermelho claro */
+}
+body.dark-mode #user-menu-dropdown a#logout-button:hover {
+    background-color: #3f1212; /* Fundo vermelho escuro */
 }
 
-/* Seções que eram brancas */
-.dark-mode section.bg-white,
-.dark-mode .bg-white {
-    background-color: #1f2937; /* Fundo das seções (gray-800) */
+/* --- Conteúdo Principal --- */
+body.dark-mode section.bg-white { /* Card "Inspiração" */
+    background-color: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode p.text-gray-700,
+body.dark-mode p.text-gray-600,
+body.dark-mode p.text-gray-800,
+body.dark-mode h1 span {
+    color: #cbd5e1; /* Tom de texto geral (Slate 300) */
+}
+body.dark-mode .section-title {
+    color: #60a5fa; /* Títulos (Blue 400) */
+}
+body.dark-mode .section-title::after {
+    background-color: #60a5fa; /* Títulos (Blue 400) */
 }
 
-/* Títulos e textos principais */
-.dark-mode h1, .dark-mode h2, .dark-mode h3,
-.dark-mode .text-gray-800 {
-    color: #f9fafb; /* Títulos (gray-50) */
+/* --- Barra de Busca --- */
+body.dark-mode #search-input {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
 }
-.dark-mode .text-gray-700 {
-    color: #d1d5db; /* gray-300 */
+body.dark-mode #search-input::placeholder {
+    color: #64748b; /* Slate 500 */
 }
-.dark-mode .text-gray-600 {
-    color: #9ca3af; /* gray-400 */
+body.dark-mode #search-input:focus {
+    border-color: #60a5fa;
+    --tw-ring-color: #60a5fa;
 }
-.dark-mode .section-title {
-    color: #93c5fd; /* Títulos de seção (blue-300) */
-}
-.dark-mode .section-title::after {
-    background-color: #60a5fa; /* Underline dos títulos (blue-400) */
-}
-.dark-mode #user-display-name {
-    color: #d1d5db; /* Nome do usuário na navbar (gray-300) */
+body.dark-mode #search-form i {
+    color: #64748b;
 }
 
-/* Cartões */
-.dark-mode .notebook-card {
-    background-color: #1f2937; /* Fundo dos cartões (gray-800) */
-    border-color: #374151; /* Borda dos cartões (gray-700) */
+/* --- Cards (Cadernos e Recentes) --- */
+body.dark-mode .notebook-card {
+    background-color: #1e293b;
+    border-color: #334155;
 }
-.dark-mode .notebook-card:hover {
-    border-color: #60a5fa; /* Borda do cartão em hover (blue-400) */
+body.dark-mode .notebook-card:hover {
+    border-color: #334155;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
-
-/* Input de Pesquisa */
-.dark-mode #search-input {
-    background-color: #374151; /* Fundo do input (gray-700) */
-    border-color: #4b5563; /* Borda do input (gray-600) */
-    color: #f9fafb; /* Cor do texto digitado (gray-50) */
-}
-.dark-mode #search-input::placeholder {
-    color: #9ca3af; /* Cor do placeholder (gray-400) */
+body.dark-mode .notebook-card .p-3 { /* Rodapé do card */
+    border-top-color: #334155;
 }
 
-/* Resultados da Pesquisa */
-.dark-mode .search-result-item {
-    background-color: #1f2937; /* Fundo do item (gray-800) */
-    border-color: #374151; /* Borda do item (gray-700) */
+/* * ============================================
+ * INÍCIO DA CORREÇÃO DE TEXTO ILEGÍVEL
+ * Sobrescreve as classes de texto do Tailwind dentro dos cards
+ * ============================================
+*/
+body.dark-mode .notebook-card .text-gray-800 { /* Título do Card */
+    color: #e2e8f0; /* Slate 200 */
 }
-.dark-mode .search-result-item:hover {
-    border-color: #60a5fa; /* Borda do item em hover (blue-400) */
+body.dark-mode .notebook-card .text-gray-500 { /* Contagem de páginas */
+    color: #94a3b8; /* Slate 400 */
 }
-.dark-mode .search-result-item .result-title {
-    color: #93c5fd; /* Título do resultado (blue-300) */
+body.dark-mode .notebook-card .text-gray-400 { /* Data de mod. e botão de opções */
+    color: #94a3b8; /* Slate 400 */
 }
-.dark-mode .search-result-item .result-path {
-    color: #9ca3af; /* Caminho do resultado (gray-400) */
+body.dark-mode .notebook-card .text-gray-400:hover { /* Hover do botão de opções */
+    color: #e2e8f0; /* Slate 200 */
 }
-.dark-mode .search-result-item .result-snippet {
-    color: #d1d5db; /* Snippet (gray-300) */
+body.dark-mode .notebook-card .text-gray-700:hover { /* Hover do texto "Renomear" no dropdown */
+    background-color: #334155;
+    color: #e2e8f0;
 }
-.dark-mode .search-result-item .result-snippet mark {
-    background-color: #4338ca; /* Fundo do highlight (indigo-700) */
-    color: #e0e7ff; /* Cor do texto no highlight (indigo-100) */
+/* ============================================
+ * FIM DA CORREÇÃO
+ * ============================================
+*/
+
+body.dark-mode #no-notebooks-message, 
+body.dark-mode #no-recent-documents-message {
+    color: #64748b; /* Slate 500 */
 }
 
-/* Modal */
-.dark-mode .modal-content {
-    background-color: #1f2937; /* Fundo do modal (gray-800) */
+/* --- Resultados da Pesquisa --- */
+body.dark-mode .search-result-item {
+    background-color: #1e293b;
+    border-color: #334155;
 }
-.dark-mode #vsb-modal-title, .dark-mode #vsb-modal-input {
-    color: #f9fafb;
+body.dark-mode .search-result-item:hover {
+    border-color: #60a5fa;
 }
-.dark-mode #vsb-modal-message, .dark-mode p {
-    color: #d1d5db;
+body.dark-mode .search-result-item .result-title {
+    color: #93c5fd; /* Blue 300 */
 }
-.dark-mode #vsb-modal-input {
-    background-color: #374151;
-    border-color: #4b5563;
+body.dark-mode .search-result-item .result-path {
+    color: #64748b;
 }
-.dark-mode #vsb-modal-cancel-btn {
-    background-color: #4b5563; /* Botão cancelar (gray-600) */
-    color: #f9fafb;
+body.dark-mode .search-result-item .result-snippet {
+    color: #cbd5e1;
 }
-.dark-mode #vsb-modal-cancel-btn:hover {
-    background-color: #6b7280; /* Hover botão cancelar (gray-500) */
-}
-
-/* Dropdown do Usuário */
-.dark-mode #user-menu-dropdown {
-    background-color: #1f2937; /* Fundo do dropdown (gray-800) */
-    --tw-ring-color: rgba(255, 255, 255, 0.1);
-}
-.dark-mode #user-menu-dropdown a {
-    color: #d1d5db;
-}
-.dark-mode #user-menu-dropdown a:hover {
-    background-color: #374151; /* Hover nos itens do menu (gray-700) */
-}
-.dark-mode #user-menu-dropdown a#logout-button {
-    color: #f87171; /* Botão Sair (red-400) */
-}
-.dark-mode #user-menu-dropdown a#logout-button:hover {
-    background-color: #450a0a; /* Hover Sair (red-900) */
-    color: #fecaca; /* Texto Hover Sair (red-200) */
+body.dark-mode .search-result-item .result-snippet mark {
+    background-color: #365314; /* green-900 */
+    color: #a3e635; /* lime-400 */
 }
 
-/* Scrollbar personalizada para Dark Mode */
-.dark-mode ::-webkit-scrollbar-track {
-    background: #1f2937; /* Trilha (gray-800) */
+/* --- Modal --- */
+body.dark-mode #vsb-modal .modal-content {
+    background-color: #1e293b;
 }
-.dark-mode ::-webkit-scrollbar-thumb {
-    background: #4b5563; /* Polegar (gray-600) */
+body.dark-mode #vsb-modal-title {
+    color: #e2e8f0;
 }
-.dark-mode ::-webkit-scrollbar-thumb:hover {
-    background: #6b7280; /* Polegar em hover (gray-500) */
+body.dark-mode #vsb-modal-message {
+    color: #cbd5e1;
 }
+body.dark-mode #vsb-modal-input {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+body.dark-mode #vsb-modal-input::placeholder {
+    color: #64748b;
+}
+body.dark-mode #vsb-modal-cancel-btn {
+    background-color: #334155;
+    color: #e2e8f0;
+}
+body.dark-mode #vsb-modal-cancel-btn:hover {
+    background-color: #475569;
+}
+
+/* --- Footer --- */
+body.dark-mode footer {
+    background-color: #1e293b;
+    color: #64748b;
+    border-top: 1px solid #334155;
+}
+
+/* --- Barra de Rolagem --- */
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #1e293b; /* Fundo (Slate 800) */
+}
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #334155; /* Cor (Slate 700) */
+}
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #475569; /* Hover (Slate 600) */
+}
+/* ================================================================== */
+/* FIM: MODO NOTURNO (HOME PAGE) */
+/* ================================================================== */

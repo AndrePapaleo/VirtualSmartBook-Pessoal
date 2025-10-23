@@ -6,18 +6,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: #f8fafc;
     overflow: hidden;
-    /* MODIFICAÇÃO: Adicionada transição */
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
-
-/* MODIFICAÇÃO: Adicionada transição para elementos principais */
-header, #sections-panel, .w-56, #editor-scroll-wrapper, .bg-white {
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-h1, h2, h3 {
-    transition: color 0.3s ease;
-}
-
 
 /* ================================================================== */
 /* PAINÉIS LATERAIS (SESSÕES E PÁGINAS)                               */
@@ -56,7 +45,7 @@ h1, h2, h3 {
 #page-render-area {
   /* ***** ALTERAÇÃO AQUI ***** */
   max-width: 1100px;  /* Aumentamos a largura da "folha" de 900px para 1100px */
-  margin: 0 auto;    /* Mantém a folha centralizada */
+  margin: 0 auto;     /* Mantém a folha centralizada */
   padding: 3rem 3rem; /* Diminuímos o padding lateral de 4rem para 3rem */
 }
 
@@ -64,20 +53,16 @@ h1, h2, h3 {
 .content-editable-area {
     word-break: break-word;
     white-space: pre-wrap;
-    min-height: 375px;
+    min-height: 180px;
     outline: none;
     border: none;
     box-shadow: none;
-    /* MODIFICAÇÃO: Adicionada transição */
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .content-editable-area blockquote {
     margin-left: 20px;
     padding-left: 15px;
     border-left: 3px solid #d1d5db;
-    /* MODIFICAÇÃO: Adicionada transição */
-    transition: border-color 0.3s ease;
 }
 
 
@@ -87,269 +72,387 @@ h1, h2, h3 {
 .toolbar-icon-btn {
     padding: 0.5rem;
     border-radius: 0.375rem;
-    /* MODIFICAÇÃO: Linha completada e transição de cor adicionada */
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.2s;
 }
-
-/* MODIFICAÇÃO: Estilos adicionados para novos botões e elementos */
-
 .toolbar-icon-btn:hover:not(:disabled) {
-    background-color: #f3f4f6; /* gray-100 */
+    background-color: #f1f5f9;
+}
+.toolbar-icon-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .toolbar-btn {
-    padding: 0.375rem 0.75rem;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    min-width: 36px;
+    height: 36px;
+    border: 1px solid transparent;
     border-radius: 0.375rem;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-    border: 1px solid #d1d5db; /* gray-300 */
+    transition: background-color 0.2s, color 0.2s;
 }
-.toolbar-btn:hover:not(.active-format) { background-color: #f3f4f6; /* gray-100 */ }
-.toolbar-btn.active-format {
-    background-color: #dbeafe; /* blue-100 */
-    color: #1d4ed8; /* blue-700 */
-    border-color: #93c5fd; /* blue-300 */
+.toolbar-btn:hover {
+    background-color: #f1f5f9;
 }
-
 
 .toolbar-select {
-    padding: 0.375rem;
+    padding: 0 0.5rem;
+    height: 36px;
+    border: 1px solid transparent;
     border-radius: 0.375rem;
-    border: 1px solid #d1d5db;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    transition: background-color 0.2s;
+    background-color: white;
 }
 
-.toolbar-separator {
-    width: 1px;
-    background-color: #e5e7eb; /* gray-200 */
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-    height: 24px;
-    transition: background-color 0.3s ease;
+.toolbar-select:hover {
+    background-color: #f1f5f9;
+}
+
+.toolbar-btn.btn-active {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.color-preview {
+    width: 16px;
+    height: 4px;
+    border: 1px solid #e2e8f0;
+    border-radius: 2px;
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .color-palette {
     position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 5px;
-    z-index: 100;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 8px;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 8px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    z-index: 10;
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 4px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-.color-preview {
-    width: 16px;
-    height: 4px;
-    border: 1px solid #777;
-    margin-top: 2px;
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 4px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
 }
 
-#toggle-sidebar-btn {
-    position: absolute;
-    left: calc(16rem + 14rem); /* w-64 + w-56 */
-    top: 50%;
-    transform: translateY(-50%);
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-left: 0;
-    padding: 1.5rem 0.25rem;
-    border-top-right-radius: 0.5rem;
-    border-bottom-right-radius: 0.5rem;
-    transition: left 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    color: #4b5563; /* gray-600 */
+.color-swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid #f1f5f9;
+    transition: transform 0.1s ease;
 }
-#toggle-sidebar-btn:hover {
-    background-color: #f9fafb; /* gray-50 */
+
+.color-swatch:hover {
+    transform: scale(1.15);
+    border-color: #94a3b8;
 }
-#sidebar-wrapper.collapsed + #toggle-sidebar-btn {
-    left: 0;
+
+.toolbar-separator {
+    width: 1px;
+    height: 20px;
+    background-color: #e5e7eb;
+    margin: 0 4px;
 }
 
 .modal-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    text-align: left;
     width: 100%;
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
 }
 .modal-input-field {
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid #D1D5DB;
     border-radius: 0.375rem;
     margin-bottom: 1rem;
 }
 
 
-/* ================================================================== */
-/* INÍCIO: ESTILOS PARA O DARK MODE (ADICIONADO E ATUALIZADO)         */
-/* ================================================================== */
-
-body.dark-mode {
-    background-color: #111827; /* Fundo principal (gray-900) */
-    color: #d1d5db; /* Cor de texto principal (gray-300) */
-}
-
-/* Cabeçalhos e barras de ferramentas */
-.dark-mode header,
-.dark-mode .bg-white {
-    background-color: #1f2937; /* Fundo dos elementos (gray-800) */
-    color: #d1d5db;
-    border-color: #374151; /* Borda (gray-700) */
-}
-
-/* Painel de Páginas (que era bg-gray-50) */
-.dark-mode .bg-gray-50 {
-    background-color: #111827; /* Fundo (gray-900) */
-    border-color: #374151;
-}
-
-/* Textos e Títulos */
-.dark-mode h1, .dark-mode h2, .dark-mode h3,
-.dark-mode #active-notebook-name,
-.dark-mode #current-page-title,
-.dark-mode .text-gray-900,
-.dark-mode .text-gray-800 {
-    color: #f9fafb; /* Textos de destaque (gray-50) */
-}
-
-.dark-mode .text-blue-700 {
-    color: #93c5fd; /* Azul mais claro (blue-300) */
-}
-
-/* Ícones e Botões */
-.dark-mode .toolbar-icon-btn,
-.dark-mode .text-gray-600,
-.dark-mode .text-gray-500 {
-    color: #d1d5db; /* Ícones (gray-300) */
-}
-.dark-mode .toolbar-icon-btn:hover:not(:disabled) {
-    background-color: #374151; /* Hover nos ícones (gray-700) */
-}
-.dark-mode .hover\:text-blue-600:hover {
-    color: #93c5fd; /* Hover azul (blue-300) */
-}
-
-/* Botões de exportação e resumos */
-.dark-mode .bg-gray-100 {
-    background-color: #374151; /* Fundo (gray-700) */
-    color: #d1d5db;
-}
-.dark-mode .bg-gray-100:hover {
-    background-color: #4b5563; /* gray-600 */
-}
-
-
-/* Cronômetro */
-.dark-mode .bg-blue-100 {
-    background-color: #1e40af; /* Fundo azul escuro (blue-800) */
-    color: #dbeafe; /* Texto azul claro (blue-200) */
-}
-
-/* Área de Edição */
-.dark-mode #editor-scroll-wrapper {
-    background-color: #111827; /* Fundo da área de scroll (gray-900) */
-}
-.dark-mode #page-render-area,
-.dark-mode #page-content {
-    background-color: #1f2937; /* Fundo do editor (gray-800) */
-    color: #d1d5db;
-}
-.dark-mode .content-editable-area blockquote {
-    border-left-color: #4b5563; /* gray-600 */
-}
-
-/* Modais */
-.dark-mode #confirmation-modal .bg-white,
-.dark-mode #summaries-modal .bg-white,
-.dark-mode #mind-map-modal .bg-white,
-.dark-mode #custom-context-menu {
-    background-color: #1f2937;
-    border-color: #374151;
-}
-
-.dark-mode #modal-cancel-btn {
-    background-color: #4b5563;
-    color: #f9fafb;
-}
-.dark-mode #modal-cancel-btn:hover {
-    background-color: #6b7280;
-}
-
-.dark-mode .modal-label {
-    color: #d1d5db;
-}
-.dark-mode .modal-input-field,
-.dark-mode #modal-input {
-    background-color: #374151;
-    border-color: #4b5563;
-    color: #f9fafb;
-}
-
-/* Menu de Contexto (Resumir/Mapa Mental) */
-.dark-mode #custom-context-menu button {
-    color: #d1d5db;
-}
-.dark-mode #custom-context-menu button:hover {
-    background-color: #374151;
-}
-
-/* Botões da Barra de Ferramentas do Editor */
-.dark-mode .toolbar-btn {
-    background-color: #1f2937; /* gray-800 */
-    color: #d1d5db; /* gray-300 */
-    border-color: #4b5563; /* gray-600 */
-}
-.dark-mode .toolbar-btn:hover:not(.active-format) {
-    background-color: #374151; /* gray-700 */
-}
-.dark-mode .toolbar-btn.active-format {
-    background-color: #1e40af; /* blue-800 */
-    color: #dbeafe; /* blue-200 */
-    border-color: #3b82f6; /* blue-500 */
-}
-.dark-mode .toolbar-select {
-    background-color: #1f2937;
-    color: #d1d5db;
-    border-color: #4b5563;
-}
-.dark-mode .toolbar-separator {
-    background-color: #374151; /* gray-700 */
-}
-.dark-mode .color-palette {
-    background-color: #1f2937;
-    border-color: #374151;
-}
-.dark-mode .color-preview {
-    border-color: #9ca3af; /* gray-400 */
-}
-
-/* Botão de Recolher Sidebar */
-.dark-mode #toggle-sidebar-btn {
-    background-color: #1f2937; /* gray-800 */
-    border-color: #374151; /* gray-700 */
-    color: #9ca3af; /* gray-400 */
-}
-.dark-mode #toggle-sidebar-btn:hover {
-    background-color: #374151; /* gray-700 */
-}
-
-/* Scrollbar */
-.dark-mode ::-webkit-scrollbar {
+/* Estilização da barra de rolagem */
+::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
-.dark-mode ::-webkit-scrollbar-track {
-    background: #1f2937;
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
 }
-.dark-mode ::-webkit-scrollbar-thumb {
-    background: #4b5563;
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
 }
-.dark-mode ::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+#summaries-list-container {
+    overflow-y: auto;
+}
+
+summary {
+    list-style: none;
+}
+summary::-webkit-details-marker {
+    display: none;
+}
+
+/* ================================================================== */
+/* BARRA LATERAL RECOLHÍVEL                                           */
+/* ================================================================== */
+
+#toggle-sidebar-btn {
+    position: absolute;
+    top: 50%;
+    left: calc(16rem + 14rem); 
+    transform: translateY(-50%);
+    width: 26px;
+    height: 40px;
+    background-color: #3b82f6;
+    color: white;
+    border: 1px solid #d1d5db;
+    border-left: none;
+    border-radius: 0 13px 13px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 2px;
+    cursor: pointer;
+    box-shadow: 2px 0px 4px rgba(0,0,0,0.1);
+    transition: left 0.3s ease-in-out, background-color 0.2s;
+}
+
+#toggle-sidebar-btn:hover {
+    background-color: #2563eb;
+}
+
+#sidebar-wrapper {
+    transition: margin-left 0.3s ease-in-out;
+}
+
+#sidebar-wrapper.collapsed {
+    margin-left: -30rem;
+}
+
+#toggle-sidebar-btn.collapsed {
+    left: 0;
+    transform: translateY(-50%);
+    border-radius: 0 13px 13px 0;
+    box-shadow: 2px 0px 4px rgba(0,0,0,0.2);
+}
+
+
+/* ================================================================== */
+/* MODO NOTURNO (PALETA SLATE - REVISADA)                             */
+/* ================================================================== */
+
+/* --- Controles do Ícone --- */
+#dark-mode-toggle-btn .fa-sun {
+    display: none; /* Sol escondido por padrão */
+}
+body.dark-mode #dark-mode-toggle-btn .fa-sun {
+    display: inline-block; /* Sol aparece no modo noturno */
+}
+body.dark-mode #dark-mode-toggle-btn .fa-moon {
+    display: none; /* Lua desaparece no modo noturno */
+}
+
+/* --- Cores Globais --- */
+body.dark-mode {
+    background-color: #0f172a; /* Cor de fundo principal (Slate 950) */
+    color: #e2e8f0; /* Cor do texto (Slate 200) */
+}
+
+/* --- Header (Barra Superior) --- */
+body.dark-mode header {
+    background-color: #1e293b; /* Fundo do header (Slate 800) */
+    border-color: #334155; /* Borda (Slate 700) */
+}
+body.dark-mode #active-notebook-name {
+    color: #e2e8f0;
+}
+body.dark-mode .toolbar-icon-btn {
+    color: #94a3b8; /* Cor dos ícones (Slate 400) */
+}
+body.dark-mode .toolbar-icon-btn:hover:not(:disabled) {
+    background-color: #334155; /* Fundo do hover (Slate 700) */
+    color: #e2e8f0; /* Cor do hover (Slate 200) */
+}
+body.dark-mode .toolbar-icon-btn.text-red-500:hover {
+    color: #f87171; /* Vermelho claro */
+}
+
+/* --- Toolbar (Barra de Ferramentas) --- */
+body.dark-mode div.bg-white.p-3 { /* Seletor específico para a barra de ferramentas */
+    background-color: #1e293b; /* Fundo (Slate 800) */
+    border-color: #334155; /* Borda (Slate 700) */
+}
+body.dark-mode .toolbar-btn {
+    color: #94a3b8; /* Ícones (Slate 400) */
+}
+body.dark-mode .toolbar-btn:hover {
+    background-color: #334155; /* Hover (Slate 700) */
+}
+body.dark-mode .toolbar-btn.btn-active {
+    background-color: #334155; /* Fundo do botão ativo (Slate 700) */
+    color: #e2e8f0; /* Cor do botão ativo (Slate 200) */
+}
+body.dark-mode .toolbar-select {
+    background-color: #1e293b; /* Fundo (Slate 800) */
+    color: #e2e8f0;
+    border-color: #334155;
+}
+body.dark-mode .toolbar-select:hover {
+    background-color: #334155;
+}
+body.dark-mode .toolbar-separator {
+    background-color: #334155;
+}
+body.dark-mode .color-preview {
+    border-color: #334155;
+}
+body.dark-mode .color-palette {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode .color-swatch {
+    border-color: #334155;
+}
+body.dark-mode .color-swatch:hover {
+    border-color: #94a3b8;
+}
+body.dark-mode #view-summaries-btn,
+body.dark-mode #export-md-btn,
+body.dark-mode #export-pdf-btn {
+    background-color: #334155;
+    color: #e2e8f0;
+}
+body.dark-mode #view-summaries-btn:hover,
+body.dark-mode #export-md-btn:hover,
+body.dark-mode #export-pdf-btn:hover {
+    background-color: #475569; /* Slate 600 */
+}
+body.dark-mode .flex.items-center.space-x-2.bg-blue-100 { /* Cronômetro */
+    background-color: #1e3a8a; /* Blue 900 */
+    color: #93c5fd; /* Blue 300 */
+}
+body.dark-mode #save-status {
+    color: #64748b; /* Slate 500 */
+}
+
+/* --- Sidebars (Sessões e Páginas) --- */
+body.dark-mode #sections-panel {
+    background-color: #1e293b; /* Fundo (Slate 800) */
+    border-color: #334155;
+}
+body.dark-mode .w-56.bg-gray-50 { /* Painel de Páginas */
+    background-color: #0f172a; /* Fundo (Slate 950) - IGUAL AO EDITOR */
+    border-color: #334155;
+}
+body.dark-mode #sections-panel .border-b,
+body.dark-mode .w-56.bg-gray-50 .border-b {
+    border-color: #334155;
+}
+body.dark-mode #sections-panel .text-blue-700,
+body.dark-mode .w-56.bg-gray-50 .text-blue-700 {
+    color: #60a5fa; /* Títulos "Sessões" e "Páginas" (Blue 400) */
+}
+/* Cor de fundo para os itens da lista (gerados por JS) no hover */
+body.dark-mode #sections-list .rounded-md:hover,
+body.dark-mode #pages-list .rounded-md:hover {
+    background-color: #334155;
+}
+body.dark-mode .active-item {
+    background-color: #3b82f6; /* Azul Padrão */
+}
+body.dark-mode .active-item:hover {
+    background-color: #2563eb; /* Azul Padrão Hover */
+}
+
+/* --- Área do Editor (A GRANDE MUDANÇA) --- */
+body.dark-mode #editor-scroll-wrapper {
+    background-color: #0f172a; /* Fundo da área de rolagem (Slate 950) */
+}
+body.dark-mode #page-render-area {
+    background-color: #0f172a; /* Fundo da "folha" (Slate 950) - MESMA COR */
+}
+body.dark-mode #current-page-title {
+    color: #e2e8f0;
+}
+body.dark-mode #page-content {
+    background-color: #0f172a; /* Fundo do editor (Slate 950) - MESMA COR */
+    color: #e2e8f0; /* Cor do texto principal do editor */
+}
+body.dark-mode .content-editable-area blockquote {
+    border-left-color: #64748b; /* Slate 500 */
+}
+
+/* --- Modais e Menus --- */
+body.dark-mode #confirmation-modal .bg-white,
+body.dark-mode #summaries-modal .bg-white,
+body.dark-mode #mind-map-modal .bg-white,
+body.dark-mode #custom-context-menu {
+    background-color: #1e293b; /* Fundo (Slate 800) */
+    color: #e2e8f0;
+    border-color: #334155;
+}
+body.dark-mode #summaries-modal .border-b,
+body.dark-mode #mind-map-modal .border-b {
+    border-color: #334155;
+}
+body.dark-mode #summaries-modal-close-btn,
+body.dark-mode #mind-map-modal-close-btn,
+body.dark-mode #mind-map-modal .text-gray-800 {
+    color: #94a3b8;
+}
+body.dark-mode #summaries-modal-close-btn:hover,
+body.dark-mode #mind-map-modal-close-btn:hover {
+    color: #ffffff;
+}
+body.dark-mode .modal-label {
+    color: #e2e8f0;
+}
+body.dark-mode .modal-input-field {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+body.dark-mode #modal-cancel-btn {
+    background-color: #334155;
+    color: #e2e8f0;
+}
+body.dark-mode #modal-cancel-btn:hover {
+    background-color: #475569;
+}
+body.dark-mode #custom-context-menu button {
+    color: #e2e8f0;
+}
+body.dark-mode #custom-context-menu button:hover {
+    background-color: #334155;
+}
+
+/* --- Barra de Rolagem --- */
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #1e293b; /* Fundo (Slate 800) */
+}
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #334155; /* Cor (Slate 700) */
+}
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #475569; /* Hover (Slate 600) */
 }

@@ -23,10 +23,11 @@
                 VSB <span class="font-normal text-gray-700 text-base ml-2 hidden sm:inline">| Virtual Smart Book</span>
             </a>
 
-            <div class="flex items-center space-x-4">
-                <button id="theme-toggle" class="p-2 rounded-full text-gray-600 hover:text-blue-700 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Alternar Tema">
-                    <i class="fas fa-sun text-lg" id="theme-icon"></i>
-                </button>
+            <div class="flex items-center space-x-2">
+                
+                <button id="dark-mode-toggle-btn" title="Alternar Modo Noturno" class="h-10 w-10 flex items-center justify-center rounded-full text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-moon text-lg"></i>
+                    <i class="fas fa-sun text-lg" style="display: none;"></i> </button>
 
                 <div class="relative">
                     <button id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" aria-expanded="false" aria-haspopup="true">
@@ -42,8 +43,7 @@
                         <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50" role="menuitem" tabindex="-1" id="logout-button">Sair</a>
                     </div>
                 </div>
-            </div>
-            </div>
+            </div> </div>
     </nav>
 
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
@@ -117,39 +117,6 @@
         </div>
     </footer>
 
-    <script>
-        const toggleButton = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const body = document.body;
-        const DARK_MODE_CLASS = 'dark-mode';
-
-        // 1. Aplica o tema salvo no localStorage ao carregar
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            body.classList.add(DARK_MODE_CLASS);
-            if(themeIcon) {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
-        }
-
-        // 2. Adiciona o Listener de Clique no botão
-        if (toggleButton) {
-            toggleButton.addEventListener('click', () => {
-                body.classList.toggle(DARK_MODE_CLASS);
-
-                if (body.classList.contains(DARK_MODE_CLASS)) {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                    localStorage.setItem('theme', 'light');
-                }
-            });
-        }
-    </script>
     <script type="module" src="../js/home.js"></script>
 </body>
 </html>

@@ -19,6 +19,7 @@ const quoteOfTheDayEl = document.getElementById('quote-of-the-day');
 const recentDocumentsGrid = document.getElementById('recent-documents-grid');
 const noRecentDocumentsMessage = document.getElementById('no-recent-documents-message');
 const profileLink = document.getElementById('profile-link'); // Link para o perfil
+const darkModeToggleBtn = document.getElementById('dark-mode-toggle-btn'); // <-- ADICIONADO
 
 // --- Elementos do Modal ---
 const vsbModal = document.getElementById('vsb-modal');
@@ -49,6 +50,59 @@ const motivationalQuotes = [
     { quote: "Parasita hoje, um coitado amanhã. Correria hoje, vitória amanhã.", author: "Racionais MC" },
     { quote: "Pensamento é força criadora, o amanhã é ilusório porque ainda não existe, o hoje é real. A oportunidade de mudança está no presente", author: "Racionais MC" }
 ];
+
+// ==================================================================
+// INÍCIO: Lógica do Modo Noturno (ADICIONADO)
+// ==================================================================
+
+/**
+ * Aplica o estado visual do Modo Noturno (classe no body e ícones).
+ * @param {boolean} isDarkMode - True para ativar, false para desativar.
+ */
+function setDarkModeState(isDarkMode) {
+    if (!darkModeToggleBtn) return; // Proteção caso o botão não exista
+    const moonIcon = darkModeToggleBtn.querySelector('.fa-moon');
+    const sunIcon = darkModeToggleBtn.querySelector('.fa-sun');
+
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        if (moonIcon) moonIcon.style.display = 'none';
+        // Usamos style.display para sobrescrever o style inline do HTML
+        if (sunIcon) sunIcon.style.display = 'inline-block'; 
+    } else {
+        document.body.classList.remove('dark-mode');
+        if (moonIcon) moonIcon.style.display = 'inline-block';
+        if (sunIcon) sunIcon.style.display = 'none';
+    }
+}
+
+/**
+ * Alterna o modo noturno e salva a preferência no localStorage.
+ */
+function toggleDarkMode() {
+    const isCurrentlyDarkMode = document.body.classList.contains('dark-mode');
+    const newState = !isCurrentlyDarkMode; // O novo estado
+    
+    setDarkModeState(newState); // Aplica o novo estado visual
+    localStorage.setItem('darkMode', newState ? 'enabled' : 'disabled'); // Salva
+}
+
+/**
+ * (IIFE) Inicializa o modo noturno ao carregar o script.
+ */
+(function initializeDarkMode() {
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode === 'enabled') {
+        setDarkModeState(true);
+    } else {
+        setDarkModeState(false); // Garante o estado claro se não estiver salvo
+    }
+})();
+
+// ==================================================================
+// FIM: Lógica do Modo Noturno
+// ==================================================================
+
 
 // --- PONTO DE ENTRADA: Verifica o estado de autenticação do usuário ---
 onAuthStateChanged(auth, (user) => {
@@ -341,6 +395,11 @@ function createSnippet(text, query) {
 
 
 // --- EVENT LISTENERS ---
+
+// ADICIONADO: Listener para o botão de modo noturno
+if (darkModeToggleBtn) {
+    darkModeToggleBtn.addEventListener('click', toggleDarkMode);
+}
 
 if (createNotebookButton) { 
     createNotebookButton.addEventListener('click', () => {

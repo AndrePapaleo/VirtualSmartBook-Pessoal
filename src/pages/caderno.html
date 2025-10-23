@@ -29,22 +29,18 @@
                 </a>
                 <h1 id="active-notebook-name" class="text-lg font-semibold text-gray-800">Carregando...</h1>
             </div>
-
-            <div class="flex items-center space-x-4">
-                <button id="theme-toggle" class="p-2 rounded-full text-gray-600 hover:text-blue-600 hover:bg-gray-100 transition-colors duration-200 focus:outline-none" aria-label="Alternar Tema">
-                    <i class="fas fa-sun text-lg" id="theme-icon"></i>
+            <div class="flex items-center space-x-1">
+                <button id="dark-mode-toggle-btn" title="Alternar Modo Noturno" class="toolbar-icon-btn text-gray-500 hover:text-blue-600">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i> </button>
+                <button id="rename-notebook-btn" title="Renomear Caderno" class="toolbar-icon-btn text-gray-500 hover:text-blue-600">
+                    <i class="fas fa-edit"></i>
                 </button>
-
-                <div class="flex items-center space-x-1">
-                    <button id="rename-notebook-btn" title="Renomear Caderno" class="toolbar-icon-btn text-gray-500 hover:text-blue-600">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button id="delete-notebook-btn" title="Excluir Caderno" class="toolbar-icon-btn text-red-500 hover:text-red-600">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
+                <button id="delete-notebook-btn" title="Excluir Caderno" class="toolbar-icon-btn text-red-500 hover:text-red-600">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             </div>
-            </header>
+        </header>
 
         <div class="bg-white p-3 border-b border-gray-200 flex items-center justify-between shadow-md flex-wrap gap-y-2 flex-shrink-0">
             <div class="flex items-center space-x-2 flex-wrap">
@@ -99,7 +95,6 @@
                 </div>
                 <div class="toolbar-separator"></div>
                 
-                <button id="link-btn" class="toolbar-btn" title="Inserir link"><i class="fas fa-link"></i></button>
                 <div class="toolbar-separator"></div>
 
                 <select id="heading-select" class="toolbar-select">
@@ -163,7 +158,7 @@
                     <div id="sections-list" class="space-y-1 p-2 flex-grow overflow-y-auto"></div>
                 </div>
                 <div class="w-56 bg-gray-50 border-r border-gray-200 flex flex-col">
-                    <div class="p-4 border-b border-gray-200 text-lg font-semibold text-blue-700 flex justify-between items-center flex-shrink-0">
+                     <div class="p-4 border-b border-gray-200 text-lg font-semibold text-blue-700 flex justify-between items-center flex-shrink-0">
                         <span>Páginas</span>
                         <div class="flex space-x-2">
                             <button id="add-page-btn" title="Adicionar Página" class="toolbar-icon-btn text-gray-500 hover:text-green-600"><i class="fas fa-plus"></i></button>
@@ -230,39 +225,6 @@
         <button id="mind-map-btn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-sitemap mr-2"></i>Gerar Mapa Mental</button>
     </div>
 
-    <script>
-        const toggleButton = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const body = document.body;
-        const DARK_MODE_CLASS = 'dark-mode';
-
-        // 1. Aplica o tema salvo no localStorage ao carregar
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            body.classList.add(DARK_MODE_CLASS);
-            if(themeIcon) {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
-        }
-
-        // 2. Adiciona o Listener de Clique no botão
-        if (toggleButton) {
-            toggleButton.addEventListener('click', () => {
-                body.classList.toggle(DARK_MODE_CLASS);
-
-                if (body.classList.contains(DARK_MODE_CLASS)) {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                    localStorage.setItem('theme', 'light');
-                }
-            });
-        }
-    </script>
     <script type="module" src="../js/caderno.js"></script>
 </body>
 </html>
